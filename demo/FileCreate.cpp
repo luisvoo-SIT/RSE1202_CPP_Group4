@@ -4,7 +4,8 @@
 
 using namespace std;
 
-string FileName ;
+string FileName;
+
 int main() 
 {
     cout << "please enter the name of file:(include file type)";

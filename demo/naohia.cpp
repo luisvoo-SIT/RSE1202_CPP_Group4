@@ -50,21 +50,21 @@ public:
         }
     }
    
-    void profiling //usually is public so others can use
+    void profiling() //usually is public so others can use
     {
         cout << "nihao " << name << endl;
         cout << "i am " << age << endl;
         cout << " " << nationality << endl << endl;    
     }
-    void setname //allow for changing variables if need be
+    void setname(string newname) //allow for changing variables if need be
     {
         name = newname;
     }
-    void getname //user input for name
+    void getname(string name) //user input for name
     {
         return name;
     }
-}
+};
 
 int main() //using the class here
 {
