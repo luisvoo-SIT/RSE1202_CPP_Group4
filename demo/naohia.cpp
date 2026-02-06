@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 using namespace std;
+//test comment
 
 /*
 process of creating a class:
