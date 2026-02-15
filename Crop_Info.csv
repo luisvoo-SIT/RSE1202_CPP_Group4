@@ -1,0 +1,2 @@
+Name, minHumidity, maxHumidity, minTemperature, maxTemperature, minUVIntensity, maxUVIntensity, waterRequirement
+Spinach,60,75,15,25,10,20,4
