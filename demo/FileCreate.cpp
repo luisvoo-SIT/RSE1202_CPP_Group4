@@ -4,7 +4,8 @@
 
 using namespace std;
 
-string FileName ;
+string FileName;
+//test comment, remove later
 int main() 
 {
     cout << "please enter the name of file:(include file type)";
@@ -25,5 +26,7 @@ int main()
         cerr << "Error: Unable to open file." << endl;
     }
 
+    cout << "Thanks for using S.A.G.E";
     return 0;
+    
 }
