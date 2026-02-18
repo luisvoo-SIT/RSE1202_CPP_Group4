@@ -1,3 +1,3 @@
-Name, minHumidity, maxHumidity, minTemperature, maxTemperature, minUVIntensity, maxUVIntensity, waterRequirement,time
+Name, minHumidity, maxHumidity, minTemperature, maxTemperature, minUVIntensity, maxUVIntensity, waterRequirement,timetogrow
 Spinach,60,75,15,25,10,20,4,5
-Marijuana,30,90,15,30,0,8.4,4
+Marijuana,30,90,15,30,0,8,4,5
