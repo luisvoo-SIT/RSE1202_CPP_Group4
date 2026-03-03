@@ -7,6 +7,6 @@ class Actuator
     
 
     public:
-    
 
-}
+
+};
