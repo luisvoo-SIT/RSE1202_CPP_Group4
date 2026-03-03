@@ -65,10 +65,8 @@ vector<Crop> loadCrops(const string &filename) {
         double minH, maxH, minT, maxT, minUV, maxUV, water, time;
         char comma;
         if (getline(ss, name, ',') &&
-            ss >> minH >> comma >> maxH >> comma
-               >> minT >> comma >> maxT >> comma
-               >> minUV >> comma >> maxUV >> comma
-               >> water >> comma >> time) {
+            ss >> minH >> comma >> maxH >> comma >> minT >> comma >> maxT >> comma >> minUV >> comma >> maxUV >> comma >> water >> comma >> time) 
+        {
             crops.emplace_back(name, minH, maxH, minT, maxT, minUV, maxUV, water, time);
         }
     }
