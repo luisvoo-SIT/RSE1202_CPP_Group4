@@ -3,4 +3,8 @@
 
 using namespace std;
 
-cout << "SAGE Simulator Group 4" << endl;
+int main()
+{
+    cout << "SAGE Simulator Group 4" << endl;
+    return 0;
+}
