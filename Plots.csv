@@ -1,5 +1,10 @@
-Plot_ID, Location, Crop_Type, Harvest_Yield_KG
-1, Plot_A1, Carrot, 210
-2, Plot_A2, Potato, 450
-3, Plot_B1, Lettuce, 130
-4, Plot_B2, Onion, 300
+PlotNumber,CropName,PlantAge,Status
+1,Spinach,2,Growing
+2,Cabbage,10,Growing
+3,Lettuce,10,Harvest
+4,Coriander,4,Harvest
+5,Broccoli,3,Growing
+6,Spinach,5,Harvest
+7,Lettuce,1,Growing
+8,Cabbage,13,Harvest
+9,Broccoli,7,Growing
