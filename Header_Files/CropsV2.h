@@ -21,11 +21,12 @@ protected:
 
 public:
     // Constructor
-    Crop();
+    Crop(string name, int minH, int maxH, int minT, int maxT,
+     int minUV, int maxUV, int water, int timeToGrow);
 
-    vector<Crop> loadCrops(const string &filename);
+    static vector<Crop> loadCrops(const string &filename);
 
-    virtual void assignLoadedCrops(const vector<Crop> &loadedCrops);
+    //virtual void assignLoadedCrops(const vector<Crop> &loadedCrops);
 
     void displaycropsinfo();
 };
