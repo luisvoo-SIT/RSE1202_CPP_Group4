@@ -1,13 +1,18 @@
 #include "Actuators.h"
 
-// Implementation of Base class (Sensor)
-Actuator::Actuator(string name)
+// Constructor definition
+Actuator::Actuator()
 {
-    actuatorName = name;  //assigns the object "sensorName" to string variable "name"
+    actuatorLevel = 100; // default level (100%)
 }
 
-Actuator::~Actuator()
+void Actuator::adjustActuatorLevel(int value)
 {
-    // Destructor (empty but good practice)
+    actuatorLevel = value; // assign actuator value to new value
 }
 
+// Function to display actuator level
+void Actuator::displayActuatorLevel()
+{
+    cout << ">>>Current actuator level is set to: " << actuatorLevel << "%" << endl;
+}
