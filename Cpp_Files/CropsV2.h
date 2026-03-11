@@ -26,7 +26,6 @@ public:
 
     static vector<Crop> loadCrops(const string &filename);
 
-
     //virtual void assignLoadedCrops(const vector<Crop> &loadedCrops);
 
     void displaycropsinfo();

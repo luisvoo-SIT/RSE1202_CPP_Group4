@@ -63,7 +63,10 @@ vector<Crop> Crop::loadCrops(const string &filename) {
     timeToGrow = stoi(fields[8]);
 
     crops.push_back(Crop(localName, minH, maxH, minT, maxT, minUV, maxUV, water, timeToGrow));
-    cout << "Loaded crop: " << localName << endl;
+    cout << "what is in crops vector : " << endl; //vector to print out << endl;
+
+
+
 }
 return crops;
 }
@@ -73,7 +76,14 @@ return crops;
     //and then create a vector of that struct or class to store all the crops loaded from the file
 
 
-    
+void Crop::displaycropsinfo() {
+    cout << "Name: " << name << "\n"
+         << "  Humidity range: " << minHumidity << " - " << maxHumidity << "\n"
+         << "  Temperature range: " << minTemperature << " - " << maxTemperature << "\n"
+         << "  UV intensity range: " << minUVIntensity << " - " << maxUVIntensity << "\n"
+         << "  Water requirement: " << waterRequirement << "\n"
+         << "  Time to grow: " << timeToGrow << " units\n";
+}    
     
     // Implementation for loading crops from file
 
@@ -91,5 +101,12 @@ void testUserInput() {
 int main() {
     vector<Crop> crops = Crop::loadCrops("Crop_Info.csv");
     cout << "Total crops loaded: " << crops.size() << endl;
+
+    for (size_t i = 0; i < crops.size(); ++i) {
+        cout << "\n--- Crop " << i+1 << " ---\n";
+        crops[i].displaycropsinfo();
+    }
+
+
     return 0;
 }
