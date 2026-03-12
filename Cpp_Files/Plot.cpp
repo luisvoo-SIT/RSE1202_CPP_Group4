@@ -10,6 +10,9 @@
 
 using namespace std;
 
+//global variables:
+int farmchoice = 0;
+
 // Stores the requirements for each crop from crops.csv
 struct CropData {
     string name;
@@ -84,11 +87,12 @@ void manageFarm() {
     vector<vector<Plot>> farm(3, vector<Plot>(3));
 
     int choice = 0;
+    int a, b = 0; //for error handling, not working
 
     while (choice != 8) {
         displayFarm(farm);
         //cout << "\n1. View Plot Layout\n2. Plant Crop\n3. Water Crop\n4. Harvest Crop\n5. Time Skip\n6. Return to Main Menu\n7. View Plot Layout\nChoice: ";
-        cout << "\n1. View Plot\n2. Return to Main Menu\nnChoice: ";
+        cout << "\n1. View Plot\n2. Return to Main Menu\n   Choice: ";
         cin >> choice;
 
         /*if (choice == 1) {
@@ -190,6 +194,7 @@ void manageFarm() {
                     }
                     cout << "Invalid Plot ID. Try again." << endl;
                 } else {
+                    a++;
                     // Convert valid Plot ID to indices
                     int r = (plotId - 1) / 3;
                     int c = (plotId - 1) % 3;
@@ -218,7 +223,59 @@ void manageFarm() {
                     cin.ignore(); // Clear the newline from previous input
                     cin.get(); // Wait for Enter key
                     
-                    break; // Exit after showing details
+                    while (true) {
+                        cout << "Please select an option from the following: " << endl;
+                        cout << "1. Plant new crop" << endl;
+                        cout << "2. Harvest crop" << endl;
+                        cout << "3. Apply Pesticide" << endl;
+                        cout << "4. View Other Plots" << endl;
+                        cout << "5. Skip the Day" << endl;
+                        cout << "6. Return to Menu" << endl << endl;
+                        cout << "Select Your Option: ";
+                        cin >> farmchoice;
+
+                        if (farmchoice < 1 || farmchoice > 9) {
+                            if (cin.fail()) {
+                                cin.clear();
+                                cin.ignore(1000, '\n');
+                            }
+                            cout << "Invalid option. Try again." << endl;
+                        }
+                    
+                        else {
+                                switch (farmchoice)
+                                {
+                                    case 1: //call planting robot
+                                        cout << "Planting new crop" << endl;
+                                        //plantrobot();
+                                        break;
+                                    case 2: //call harvesting robot 
+                                        cout << "harvest da crop" << endl;
+                                        //harvestbot();
+                                        break;
+                                    case 3: //call pesticide robot
+                                        cout << "deleting pests" << endl;
+                                        //pestbot();
+                                        break;
+                                    case 4: //viewing other plots
+                                        cout << "viewing plots" << endl;    
+                                        manageFarm();
+                                        break;
+                                    case 5: //time skip (1 day increments)
+                                        cout << "zzzzz" << endl;
+                                        //time++;
+                                        break;
+                                    case 6: //back to main menu
+                                        cout << "menu" << endl;
+                                        //mainmenu.cpp
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                        break;
+                    } 
+
                 }
             }
         }
@@ -228,7 +285,6 @@ void manageFarm() {
             cout << "Returning to main menu..." << endl;
         }
     }
-
 }
     
 
