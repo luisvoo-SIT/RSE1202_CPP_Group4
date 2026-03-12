@@ -114,7 +114,7 @@ int main() {
 
     for (size_t i = 0; i < crops.size(); ++i) {
         cout << "\n--- Crop " << i+1 << " ---\n";
-        crops[i].name;
+        crops[i].getName();
     }
 
 
