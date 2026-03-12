@@ -10,7 +10,7 @@ using namespace std;
 
 
 Crop::Crop(string n, int minH, int maxH, int minT, int maxT,
-           int minUV, int maxUV, int water, int timeToGrow) {
+           int minUV, int maxUV, int water, int time) {
     name = n;
     minHumidity = minH;
     maxHumidity = maxH;
@@ -19,7 +19,7 @@ Crop::Crop(string n, int minH, int maxH, int minT, int maxT,
     minUVIntensity = minUV;
     maxUVIntensity = maxUV;
     waterRequirement = water;
-    this->timeToGrow = timeToGrow;
+    timeToGrow = time;
 }
 
 vector<Crop> Crop::loadCrops(const string &filename) {
@@ -80,18 +80,18 @@ void Crop::displaycropsinfo() {
          << "  Temperature range: " << minTemperature << " - " << maxTemperature << "\n"
          << "  UV intensity range: " << minUVIntensity << " - " << maxUVIntensity << "\n"
          << "  Water requirement: " << waterRequirement << "\n"
-         << "  Time to grow: " << timeToGrow << " units\n";
-         <<"-----------------------------\n";
+         << "  Time to grow: " << timeToGrow << " units\n"
+         << "-------------------------------";
 }    
 
 string Crop::getName() {
     return name;
 }
-string Crop::getTimetoGrow() {
+int Crop::getTimetoGrow() {
     return timeToGrow;
 }
-string Crop::getwaterRequirements() {
-    return water;
+int Crop::getwaterRequirements() {
+    return waterRequirement;
 }
 
 

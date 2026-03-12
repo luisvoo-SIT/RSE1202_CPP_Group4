@@ -29,5 +29,8 @@ public:
     //virtual void assignLoadedCrops(const vector<Crop> &loadedCrops);
 
     void displaycropsinfo();
+    string getName();
+    int getTimeToGrow();
+    int getwaterRequirements();
 };
 
