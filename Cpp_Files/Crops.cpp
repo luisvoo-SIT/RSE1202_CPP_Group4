@@ -91,7 +91,7 @@ string Crop::getTimetoGrow() {
     return timeToGrow;
 }
 string Crop::getwaterRequirements() {
-    return water;
+    return waterRequirement;
 }
 
 
