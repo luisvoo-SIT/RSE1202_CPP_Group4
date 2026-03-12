@@ -29,6 +29,7 @@ vector<Crop> Crop::loadCrops(const string &filename) {
     stringstream ss(line);
     string token;
     vector<string> fields;
+    
 
     //cout<<"Type your filename"<<endl;
     //cin>>filename;
@@ -126,15 +127,15 @@ void testUserInput() {
 
 }
 
-int main() {    
+/*int main() {    
     vector<Crop> crops = Crop::loadCrops("Crop_Info.csv");
     cout << "Total crops loaded: " << crops.size() << endl;
 
     for (size_t i = 0; i < crops.size(); ++i) {
         cout << "\n--- Crop " << i+1 << " ---\n";
-        crops[i].getName();
+        cout << crops[i].getName() << endl;
     }
 
 
     return 0;
-}
+}*/

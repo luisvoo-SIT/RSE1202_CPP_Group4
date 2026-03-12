@@ -4,10 +4,10 @@
 #include <sstream>
 #include <vector>
 #include <iomanip>
-
+#include "Header_Files/CropsV2.h"
 using namespace std;
 
-struct Crop {
+/*struct Crop {
     string name;
     int minHumidity;
     int maxHumidity;
@@ -18,7 +18,7 @@ struct Crop {
     double waterRequirement;
     int timeToGrow;
 };
-
+*/
 struct Plot {
     int plotNumber;
     string cropName;
@@ -29,33 +29,7 @@ struct Plot {
 vector<Crop> crops;
 vector<Plot> plots;
 
-// Function to load Crop_Info.csv
-void loadCropInfo() {
-    ifstream file("Crop_Info.csv");
-    string line;
-    
-    getline(file, line); // skip header
-    
-    while (getline(file, line)) {
-        stringstream ss(line);
-        string value;
-        Crop crop;
-
-        getline(ss, crop.name, ',');
-        getline(ss, value, ','); crop.minHumidity = stoi(value);
-        getline(ss, value, ','); crop.maxHumidity = stoi(value);
-        getline(ss, value, ','); crop.minTemp = stoi(value);
-        getline(ss, value, ','); crop.maxTemp = stoi(value);
-        getline(ss, value, ','); crop.minUV = stoi(value);
-        getline(ss, value, ','); crop.maxUV = stoi(value);
-        getline(ss, value, ','); crop.waterRequirement = stod(value);
-        getline(ss, value, ','); crop.timeToGrow = stoi(value);
-
-        crops.push_back(crop);
-    }
-
-    file.close();
-}
+// (Removed loadCropInfo - use Crop::loadCrops instead)
 
 // Function to load Plots.csv
 void loadPlots() {
@@ -80,11 +54,11 @@ void loadPlots() {
     file.close();
 }
 
-// Find crop info by name
-Crop* findCrop(string name) {
-    for (auto &crop : crops) {
-        if (crop.name == name)
-            return &crop;
+// Find crop info by name within a provided list
+Crop* findCrop(const vector<Crop> &cropList, const string &name) {
+    for (auto &c : cropList) {
+        if (c.getName() == name)
+            return const_cast<Crop*>(&c); // safe because returned pointer used non-modifying
     }
     return nullptr;
 }
@@ -102,13 +76,13 @@ void displayGrid() {
 
 int main() {
 
-    loadCropInfo();
+    // loadCropInfo(); // deprecated
     loadPlots();
 
     char choice;
 
     while (true) {
-
+        vector<Crop> cropList = Crop::loadCrops("Crop_Info.csv");
         displayGrid();
 
         cout << "\nSelect your plot number to view details (Q to quit): ";
@@ -125,7 +99,7 @@ int main() {
         }
 
         Plot &selectedPlot = plots[plotNum - 1];
-        Crop* crop = findCrop(selectedPlot.cropName);
+        Crop* crop = findCrop(cropList, selectedPlot.cropName);
 
         cout << "\nPlot " << selectedPlot.plotNumber << " details:\n";
         cout << "Crop: " << selectedPlot.cropName << endl;
@@ -134,11 +108,11 @@ int main() {
 
         if (crop != nullptr) {
             cout << "\nCrop Requirements:\n";
-            cout << "Humidity: " << crop->minHumidity << "-" << crop->maxHumidity << endl;
-            cout << "Temperature: " << crop->minTemp << "-" << crop->maxTemp << endl;
-            cout << "UV: " << crop->minUV << "-" << crop->maxUV << endl;
-            cout << "Water Requirement: " << crop->waterRequirement << endl;
-            cout << "Time To Grow: " << crop->timeToGrow << " months\n";
+            cout << "Humidity: " << crop->getminHumidity() << "-" << crop->getmaxHumidity() << endl;
+            cout << "Temperature: " << crop->getminTemperature() << "-" << crop->getmaxTemperature() << endl;
+            cout << "UV: " << crop->getminUVIntensity() << "-" << crop->getmaxUVIntensity() << endl;
+            cout << "Water Requirement: " << crop->getwaterRequirements() << endl;
+            cout << "Time To Grow: " << crop->getTimetoGrow() << " months\n";
         }
 
         cout << "\nPress H to Harvest, Q to return: ";
