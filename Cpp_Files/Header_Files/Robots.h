@@ -16,7 +16,7 @@ protected:
 public:
     Robot(const string& id, const string& name);
 
-    virtual ~Robot() = 0;
+    virtual ~Robot();
 
     virtual void performTask() = 0;
 
