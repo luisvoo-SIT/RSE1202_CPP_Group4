@@ -15,7 +15,7 @@ private:
 public:
     SeedingBot(const string& id, const Crop& crop);
 
-    void setCrop(const Crop& crop) { assignedCrop; }
+    void setCrop(const Crop& crop){assignedCrop =crop;}
 
 
 
