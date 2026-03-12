@@ -17,8 +17,8 @@ protected:
     bool   isOperational;
 
 public:
-    Robot(const string& id, const string& name)
-        : id(id), name(name), batteryLevel(100.0), isOperational(true) {}
+    Robot(const string& id, const string& name);
+        
 
     virtual ~Robot() = default;
 
@@ -26,27 +26,25 @@ public:
     virtual void performTask() = 0;
 
     // Shared utilities
-    virtual void recharge()   { batteryLevel = 100.0; cout << name << " fully recharged.\n"; }
-    virtual void shutdown()   { isOperational = false; cout << name << " shut down.\n"; }
-    virtual void statusReport() const {
-        cout << "=== " << name << " [" << id << "] ===\n"
-                  << "  Battery    : " << batteryLevel << "%\n"
-                  << "  Operational: " << (isOperational ? "Yes" : "No") << "\n";
-    }
+    virtual void recharge();
+    virtual void shutdown();
+    virtual void statusReport()const;
 
     bool   getIsOperational() const { return isOperational; }
     double getBatteryLevel()  const { return batteryLevel;  }
     const  string& getName() const { return name; }
 
-protected:
+    protected:
     void consumeBattery(double amount) {
         batteryLevel -= amount;
         if (batteryLevel <= 0.0) {
             batteryLevel   = 0.0;
             isOperational  = false;
-            cout << name << " battery depleted – shutting down.\n";
+            std::cout << name << " battery depleted – shutting down.\n";
         }
     }
+
+
 };
 
 
@@ -65,7 +63,7 @@ private:
     SeedPattern  pattern;
     int          seedsPlanted;
 
-    static string patternToString(SeedPattern p) {
+    static std::string patternToString(SeedPattern p) {
         switch (p) {
             case SeedPattern::ROW:       return "Row";
             case SeedPattern::GRID:      return "Grid";
@@ -95,7 +93,7 @@ public:
 
     // Plant a given number of seeds in one run
     void plantSeeds(int count) {
-        if (!isOperational) { std::cout << name << " is not operational.\n"; return; }
+        if (!isOperational) { cout << name << " is not operational.\n"; return; }
         cout << name << ": Planting " << count << " " << cropType
                   << " seeds [" << patternToString(pattern) << " pattern, "
                   << rowSpacingCm << " cm spacing, " << seedDepthCm << " cm depth]...\n";
@@ -157,7 +155,7 @@ public:
                SprayMode   mode           = SprayMode::FERTILIZER,
                double      tankCapacityL  = 50.0,
                double      sprayRate      =  0.3,
-               string chemical       = "NPK-20-20-20")
+               std::string chemical       = "NPK-20-20-20")
         : Robot(id, "SprayerBot-" + id),
           mode(mode),
           tankCapacityL(tankCapacityL),
@@ -170,11 +168,11 @@ public:
     void setChemical(const string& chem)   { chemicalName = chem; }
     void setSchedule(const vector<int>& days) { scheduleDays = days; }
     void refillTank()  { tankLevelL = tankCapacityL;
-                         cout << name << " tank refilled to " << tankCapacityL << " L.\n"; }
+                         std::cout << name << " tank refilled to " << tankCapacityL << " L.\n"; }
 
     // Spray an area (m²); returns false if tank or battery insufficient
     bool sprayArea(double areaSqM) {
-        if (!isOperational) { std::cout << name << " is not operational.\n"; return false; }
+        if (!isOperational) { cout << name << " is not operational.\n"; return false; }
         double required = areaSqM * sprayRateL_per_m2;
         if (required > tankLevelL) {
             cout << name << ": Insufficient chemical – need " << required
@@ -239,7 +237,7 @@ private:
     vector<HarvestRecord> log;
 
     // Simulate a ripeness sensor reading (in production replace with real sensor)
-    double senseRipeness(const std::string& zone) const {
+    double senseRipeness(const string& zone) const {
         // Deterministic pseudo-value based on zone string length for demo
         return 60.0 + (zone.size() % 4) * 10.0;
     }
@@ -256,12 +254,12 @@ public:
           binCurrentKg(0.0),
           harvests(0) {}
 
-    void setCropType(const std::string& crop)  { cropType = crop; }
+    void setCropType(const string& crop)  { cropType = crop; }
     void setRipenessThreshold(double t)        { ripenessThreshold = t; }
 
     // Evaluate a named zone and harvest if ripe
-    bool evaluateAndHarvest(const std::string& zone, double expectedYieldKg) {
-        if (!isOperational) { std::cout << name << " is not operational.\n"; return false; }
+    bool evaluateAndHarvest(const string& zone, double expectedYieldKg) {
+        if (!isOperational) { cout << name << " is not operational.\n"; return false; }
 
         double ripeness = senseRipeness(zone);
         cout << name << ": Scanning zone [" << zone << "] – ripeness score: "
@@ -308,7 +306,7 @@ public:
         if (!log.empty()) {
             cout << "  Harvest Log:\n";
             for (const auto& r : log)
-                cout << "    " << r.cropType << " | ripeness " << r.ripenessScore
+                std::cout << "    " << r.cropType << " | ripeness " << r.ripenessScore
                           << " | " << r.yieldKg << " kg\n";
         }
     }
@@ -339,7 +337,7 @@ int main() {
     sprayer.statusReport();
     sprayer.performTask();          // 200 m² pass
     sprayer.sprayArea(150.0);
-    cout << "  Scheduled today (day 2)? "
+    std::cout << "  Scheduled today (day 2)? "
               << (sprayer.isScheduledToday(2) ? "Yes" : "No") << "\n\n";
 
     // --- HarvestingBot ---
@@ -349,18 +347,18 @@ int main() {
     harvester.evaluateAndHarvest("Field-C1", 60.0);
     harvester.evaluateAndHarvest("Field-A2", 90.0);
     harvester.emptyBin();
-    cout << "\n";
+    std::cout << "\n";
 
     // --- Polymorphic dispatch ---
-    cout << "--- Polymorphic task dispatch ---\n";
-    vector<Robot*> fleet = { &seeder, &sprayer, &harvester };
+    std::cout << "--- Polymorphic task dispatch ---\n";
+    std::vector<Robot*> fleet = { &seeder, &sprayer, &harvester };
     for (Robot* r : fleet) {
         r->performTask();
     }
 
-    cout << "\n=== Final Status Reports ===\n\n";
-    seeder.statusReport();   cout << "\n";
-    sprayer.statusReport();  cout << "\n";
+    std::cout << "\n=== Final Status Reports ===\n\n";
+    seeder.statusReport();   std::cout << "\n";
+    sprayer.statusReport();  std::cout << "\n";
     harvester.statusReport();
 
     return 0;
