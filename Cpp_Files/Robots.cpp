@@ -6,7 +6,7 @@
 
 #include "Header_Files/Robots.h"
 #include "Header_Files/seedingBot.h"
-#include "CropsV2.h"
+#include "Header_Files/CropsV2.h"
 
 using namespace std;
 
@@ -68,14 +68,70 @@ void SeedingBot::performTask() {
 void SeedingBot::statusReport() const {
     Robot::statusReport();
     
-    cout << "  Crop         : " << assignedCrop.getName()             << "\n"
+    cout << "  Crop         : " <<getName()             << "\n"
          << "  Time to Grow : " << assignedCrop.getTimetoGrow()       << " days\n"
-         << "  Humidity     : " << assignedCrop.getMinHumidity()
-                                << " - " << assignedCrop.getMaxHumidity()    << " %\n"
-         << "  Temperature  : " << assignedCrop.getMinTemperature()
-                                << " - " << assignedCrop.getMaxTemperature() << " C\n"
-         << "  UV Intensity : " << assignedCrop.getMinUVIntensity()
-                                << " - " << assignedCrop.getMaxUVIntensity() << "\n"
+         << "  Humidity     : " << assignedCrop.getminHumidity()
+                                << " - " << assignedCrop.getmaxHumidity()    << " %\n"
+         << "  Temperature  : " << assignedCrop.getminTemperature()
+                                << " - " << assignedCrop.getmaxTemperature() << " C\n"
+         << "  UV Intensity : " << assignedCrop.getminUVIntensity()
+                                << " - " << assignedCrop.getmaxUVIntensity() << "\n"
          << "  Water/day    : " << assignedCrop.getwaterRequirements() << " mL\n"
          << "  Seeds Planted: " << seedsPlanted                       << "\n";
+}
+
+int main() 
+{
+    // ── Step 1: Load crops from CSV file ─────────────────────
+    vector<Crop> crops = Crop::loadCrops("Crop_Info.csv");
+
+    if (crops.empty()) {
+        cout << "No crops loaded. Check your CSV file.\n";
+        return 1;
+    }
+
+    // ── Step 2: Display all available crops ──────────────────
+    cout << "=== Available Crops ===\n";
+    for (size_t i = 0; i < crops.size(); ++i) {
+        cout << i + 1 << ". ";
+        crops[i].displaycropsinfo();
+    }
+
+    // ── Step 3: Let user pick a crop ─────────────────────────
+    int choice;
+    cout << "\nSelect a crop number to assign to the seeding bot: ";
+    cin  >> choice;
+
+    if (choice < 1 || choice > (int)crops.size()) {
+        cout << "Invalid choice.\n";
+        return 1;
+    }
+
+    // ── Step 4: Create SeedingBot with selected crop ──────────
+    Crop selectedCrop = crops[choice - 1];
+    SeedingBot seeder("S01", selectedCrop);
+
+    // ── Step 5: Show robot status before task ─────────────────
+    cout << "\n=== Seeding Bot Status Before Task ===\n";
+    seeder.statusReport();
+
+    // ── Step 6: Run the seeding task ──────────────────────────
+    cout << "\n=== Running Seeding Task ===\n";
+    seeder.performTask();
+
+    // ── Step 7: Show robot status after task ──────────────────
+    cout << "\n=== Seeding Bot Status After Task ===\n";
+    seeder.statusReport();
+
+    // ── Step 8: Plant a custom number of seeds ────────────────
+    int seedCount;
+    cout << "\nHow many additional seeds to plant? ";
+    cin  >> seedCount;
+    seeder.plantSeeds(seedCount);
+
+    // ── Step 9: Final status report ───────────────────────────
+    cout << "\n=== Final Status ===\n";
+    seeder.statusReport();
+
+    return 0;
 }

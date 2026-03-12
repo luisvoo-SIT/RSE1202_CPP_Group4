@@ -84,32 +84,32 @@ void Crop::displaycropsinfo() {
          << "-------------------------------";
 }    
 
-string Crop::getName() {
+string Crop::getName() const{
     return name;
 }
-int Crop::getTimetoGrow() {
+int Crop::getTimetoGrow() const{
     return timeToGrow;
 }
-int Crop::getwaterRequirements() {
+int Crop::getwaterRequirements() const{
     return waterRequirement;
 }
-int Crop::getminHumidity() {
-        return minHumidity;
+int Crop::getminHumidity() const{
+    return minHumidity;
 }
-    int Crop::getmaxHumidity(){
-        return maxHumidity;
+int Crop::getmaxHumidity() const{
+    return maxHumidity;
     }
-    int Crop::getminTemperature(){
-        return minTemperature;
+int Crop::getminTemperature() const{
+    return minTemperature;
     }
-    int Crop::getmaxTemperature(){
+int Crop::getmaxTemperature() const {
         return maxTemperature;
     }
-    int Crop::getminUVIntensity(){
-        return minUVIntensity;
+int Crop::getminUVIntensity() const{
+    return minUVIntensity;
     }
-    int Crop::getmaxUVIntensity(){
-        return maxUVIntensity;
+int Crop::getmaxUVIntensity() const{
+    return maxUVIntensity;
     }
 
 
