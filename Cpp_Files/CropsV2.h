@@ -29,8 +29,16 @@ public:
     //virtual void assignLoadedCrops(const vector<Crop> &loadedCrops);
 
     void displaycropsinfo();
+
+
     string getName();
     int getTimetoGrow();
     int getwaterRequirements();
+    int getminHumidity();
+    int getmaxHumidity();
+    int getminTemperature();
+    int getmaxTemperature();
+    int getminUVIntensity();
+    int getmaxUVIntensity();
 };
 
