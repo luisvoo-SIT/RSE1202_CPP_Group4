@@ -12,6 +12,7 @@ using namespace std;
 
 Robot::Robot(const string& id, const string& name)
     : id(id), name(name), batteryLevel(100.0), isOperational(true) {}
+Robot:: ~Robot(){}    
 
 void Robot::consumeBattery(double amount) {
     batteryLevel -= amount;
