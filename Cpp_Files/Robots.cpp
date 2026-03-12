@@ -5,6 +5,8 @@
 #include <stdexcept>
 
 #include "Header_Files/Robots.h"
+#include "Header_Files/seedingBot.h"
+#include "CropsV2.h"
 
 using namespace std;
 
@@ -35,3 +37,45 @@ void Robot::statusReport() const {
          << "  Battery    : " << batteryLevel << "%\n"
          << "  Operational: " << (isOperational ? "Yes" : "No") << "\n";
 }         
+
+SeedingBot::SeedingBot(const string& id, const Crop& crop)
+    : Robot(id, "SeedingBot-" + id),
+      assignedCrop(crop),
+      seedsPlanted(0) {}
+
+void SeedingBot::plantSeeds(int count) {
+    if (!isOperational) {
+        cout << name << " is not operational.\n";
+        return;
+    }
+
+    cout << name << ": Planting " << count
+         << " " << assignedCrop.getName() << " seeds\n"
+         << "  Time to Grow : " << assignedCrop.getTimetoGrow()       << " days\n"
+         << "  Water/day    : " << assignedCrop.getwaterRequirements() << " mL\n";
+
+    seedsPlanted += count;
+    consumeBattery(count * 0.05);
+
+    cout << "  Done. Total seeds planted: " << seedsPlanted << "\n";
+}
+
+void SeedingBot::performTask() {
+    cout << name << ": Running standard seeding task...\n";
+    plantSeeds(100);
+}
+
+void SeedingBot::statusReport() const {
+    Robot::statusReport();
+    
+    cout << "  Crop         : " << assignedCrop.getName()             << "\n"
+         << "  Time to Grow : " << assignedCrop.getTimetoGrow()       << " days\n"
+         << "  Humidity     : " << assignedCrop.getMinHumidity()
+                                << " - " << assignedCrop.getMaxHumidity()    << " %\n"
+         << "  Temperature  : " << assignedCrop.getMinTemperature()
+                                << " - " << assignedCrop.getMaxTemperature() << " C\n"
+         << "  UV Intensity : " << assignedCrop.getMinUVIntensity()
+                                << " - " << assignedCrop.getMaxUVIntensity() << "\n"
+         << "  Water/day    : " << assignedCrop.getwaterRequirements() << " mL\n"
+         << "  Seeds Planted: " << seedsPlanted                       << "\n";
+}
