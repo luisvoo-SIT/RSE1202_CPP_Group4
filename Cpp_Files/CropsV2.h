@@ -30,7 +30,7 @@ public:
 
     void displaycropsinfo();
     string getName();
-    int getTimeToGrow();
+    int getTimetoGrow();
     int getwaterRequirements();
 };
 
