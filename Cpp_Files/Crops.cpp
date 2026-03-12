@@ -93,6 +93,24 @@ int Crop::getTimetoGrow() {
 int Crop::getwaterRequirements() {
     return waterRequirement;
 }
+int Crop::getminHumidity() {
+        return minHumidity;
+}
+    int Crop::getmaxHumidity(){
+        return maxHumidity;
+    }
+    int Crop::getminTemperature(){
+        return minTemperature;
+    }
+    int Crop::getmaxTemperature(){
+        return maxTemperature;
+    }
+    int Crop::getminUVIntensity(){
+        return minUVIntensity;
+    }
+    int Crop::getmaxUVIntensity(){
+        return maxUVIntensity;
+    }
 
 
     // Implementation for loading crops from file
