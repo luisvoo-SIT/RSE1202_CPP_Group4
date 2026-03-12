@@ -1,0 +1,7 @@
+name, symbol, growth_days, water_need_days, harvest_yield, water_per_session, optimal_moisture, optimal_temp, optimal_humidity
+Wheat, WH, 49, 3, 10, 20, 60.0, 22.0, 55.0
+Corn, CO, 70, 2, 15, 25, 70.0, 26.0, 60.0
+Tomato, TM, 35, 1, 8, 15, 75.0, 24.0, 65.0
+Potato, PT, 56, 3, 12, 20, 65.0, 20.0, 60.0
+Carrot, CR, 42, 2, 9, 15, 60.0, 18.0, 55.0
+Sunflower, SF, 63, 4, 11, 20, 55.0, 28.0, 50.0
