@@ -6,9 +6,15 @@
 
 #include "Header_Files/Robots.h"
 #include "Header_Files/seedingBot.h"
+#include "Header_Files/SprayerBot.h"
 #include "Header_Files/CropsV2.h"
 
 using namespace std;
+/*
+Start of Parent class: Robot
+Initialises global variables that the child classes will need
+Provides user with information in the status of the robot
+*/
 
 Robot::Robot(const string& id, const string& name)
     : id(id), name(name), batteryLevel(100.0), isOperational(true) {}
@@ -39,6 +45,13 @@ void Robot::statusReport() const {
          << "  Operational: " << (isOperational ? "Yes" : "No") << "\n";
 }         
 
+/*
+Start of Child Class: SeedingBot
+Purpose: so that the user can plant crops in to the plot.
+Gets data from Crops.cpp, and places it into Plot.cpp
+Provides report at the end 
+*/
+
 SeedingBot::SeedingBot(const string& id, const Crop& crop)
     : Robot(id, "SeedingBot-" + id),
       assignedCrop(crop),
@@ -63,7 +76,7 @@ void SeedingBot::plantSeeds(int count) {
 
 void SeedingBot::performTask() {
     cout << name << ": Running standard seeding task...\n";
-    plantSeeds(100);
+    plantSeeds(0);
 }
 
 void SeedingBot::statusReport() const {
@@ -80,6 +93,77 @@ void SeedingBot::statusReport() const {
          << "  Water/day    : " << assignedCrop.getwaterRequirements() << " mL\n"
          << "  Seeds Planted: " << seedsPlanted                       << "\n";
 }
+
+/*
+Start of Child Class: SprayerBot 
+Purpose: spray different agents on plants, based on user's choice 
+Provides report at the end 
+*/
+
+string SprayerBot::modeToString(SprayMode m) {
+    switch (m) {
+        case SprayMode::FERTILIZER: return "Fertilizer";
+        case SprayMode::PESTICIDE:  return "Pesticide";
+        case SprayMode::HERBICIDE:  return "Herbicide";
+        case SprayMode::CUSTOM:     return "Custom";
+    }
+    return "Unknown";
+}
+
+SprayerBot::SprayerBot(const string& id,
+                       SprayMode mode,
+                       double    tankCapacityL,
+                       double    sprayRate,
+                       string    chemical)
+    : Robot(id, "SprayerBot-" + id),
+      mode(mode),
+      tankCapacityL(tankCapacityL),
+      tankLevelL(tankCapacityL),
+      sprayRateL_per_m2(sprayRate),
+      chemicalName(move(chemical)),
+      spraySessionsDone(0) {}
+
+void SprayerBot::refillTank() {
+    tankLevelL = tankCapacityL;
+    cout << name << " tank refilled to " << tankCapacityL << " L.\n";
+}
+
+bool SprayerBot::sprayArea(double areaSqM) {
+    if (!isOperational) { cout << name << " is not operational.\n"; return false; }
+    double required = areaSqM * sprayRateL_per_m2;
+    if (required > tankLevelL) {
+        cout << name << ": Insufficient chemical – need " << required
+             << " L, have " << tankLevelL << " L. Refill required.\n";
+        return false;
+    }
+    cout << name << ": Spraying " << areaSqM << " m² with "
+         << chemicalName << " [" << modeToString(mode) << "]...\n";
+    tankLevelL -= required;
+    consumeBattery(areaSqM * 0.02);
+    ++spraySessionsDone;
+    cout << "  Used " << required << " L | Tank remaining: " << tankLevelL << " L\n";
+    return true;
+}
+
+bool SprayerBot::isScheduledToday(int dayOfWeek) const {
+    for (int d : scheduleDays)
+        if (d == dayOfWeek) return true;
+    return false;
+}
+
+void SprayerBot::performTask() {
+    sprayArea(200.0);
+}
+
+void SprayerBot::statusReport() const {
+    Robot::statusReport();
+    cout << "  Mode       : " << modeToString(mode) << "\n"
+         << "  Chemical   : " << chemicalName        << "\n"
+         << "  Tank       : " << tankLevelL << " / " << tankCapacityL << " L\n"
+         << "  Spray Rate : " << sprayRateL_per_m2  << " L/m²\n"
+         << "  Sessions   : " << spraySessionsDone   << "\n";
+}
+
 
 int main() 
 {
