@@ -1,6 +1,6 @@
 #ifndef HUMIDITYCONTROL_H
 #define HUMIDITYCONTROL_H
-#include "Actuators.h"
+#include "Header_Files/Actuators.h"
 
 // Derived class: HumidityControl
 class HumidityControl : public Actuator
