@@ -5,11 +5,21 @@
 #include <stdexcept>
 
 #include "Header_Files/Robots.h"
+#include "Header_Files/seedingBot.h"
+#include "Header_Files/SprayerBot.h"
+#include "Header_Files/CropsV2.h"
+#include "Header_Files/HarvestBot.h"
 
 using namespace std;
+/*
+Start of Parent class: Robot
+Initialises global variables that the child classes will need
+Provides user with information in the status of the robot
+*/
 
 Robot::Robot(const string& id, const string& name)
     : id(id), name(name), batteryLevel(100.0), isOperational(true) {}
+Robot:: ~Robot(){}    
 
 void Robot::consumeBattery(double amount) {
     batteryLevel -= amount;
@@ -35,3 +45,195 @@ void Robot::statusReport() const {
          << "  Battery    : " << batteryLevel << "%\n"
          << "  Operational: " << (isOperational ? "Yes" : "No") << "\n";
 }         
+
+/*
+Start of Child Class: SeedingBot
+Purpose: so that the user can plant crops in to the plot.
+Gets data from Crops.cpp, and places it into Plot.cpp
+Provides report at the end 
+*/
+
+SeedingBot::SeedingBot(const string& id, const Crop& crop)
+    : Robot(id, "SeedingBot-" + id),
+      assignedCrop(crop),
+      seedsPlanted(0) {}
+
+void SeedingBot::plantSeeds(int count) {
+    if (!isOperational) {
+        cout << name << " is not operational.\n";
+        return;
+    }
+
+    cout << name << ": Planting " << count
+         << " " << assignedCrop.getName() << " seeds\n"
+         << "  Time to Grow : " << assignedCrop.getTimetoGrow()       << " days\n"
+         << "  Water/day    : " << assignedCrop.getwaterRequirements() << " mL\n";
+
+    seedsPlanted += count;
+    consumeBattery(count * 0.05);
+
+    cout << "  Done. Total seeds planted: " << seedsPlanted << "\n";
+}
+
+void SeedingBot::performTask() {
+    cout << name << ": Running standard seeding task...\n";
+    plantSeeds(0);
+}
+
+void SeedingBot::statusReport() const {
+    Robot::statusReport();
+    
+    cout << "  Crop         : " <<getName()             << "\n"
+         << "  Time to Grow : " << assignedCrop.getTimetoGrow()       << " days\n"
+         << "  Humidity     : " << assignedCrop.getminHumidity()
+                                << " - " << assignedCrop.getmaxHumidity()    << " %\n"
+         << "  Temperature  : " << assignedCrop.getminTemperature()
+                                << " - " << assignedCrop.getmaxTemperature() << " C\n"
+         << "  UV Intensity : " << assignedCrop.getminUVIntensity()
+                                << " - " << assignedCrop.getmaxUVIntensity() << "\n"
+         << "  Water/day    : " << assignedCrop.getwaterRequirements() << " mL\n"
+         << "  Seeds Planted: " << seedsPlanted                       << "\n";
+}
+
+/*
+Start of Child Class: SprayerBot 
+Purpose: spray different agents on plants, based on user's choice 
+Provides report at the end 
+*/
+
+string SprayerBot::modeToString(SprayMode m) {
+    switch (m) {
+        case SprayMode::FERTILIZER: return "Fertilizer";
+        case SprayMode::PESTICIDE:  return "Pesticide";
+        case SprayMode::HERBICIDE:  return "Herbicide";
+        case SprayMode::CUSTOM:     return "Custom";
+    }
+    return "Unknown";
+}
+
+SprayerBot::SprayerBot(const string& id,
+                       SprayMode mode,
+                       double    tankCapacityL,
+                       double    sprayRate,
+                       string    chemical)
+    : Robot(id, "SprayerBot-" + id),
+      mode(mode),
+      tankCapacityL(tankCapacityL),
+      tankLevelL(tankCapacityL),
+      sprayRateL_per_m2(sprayRate),
+      chemicalName(std::move(chemical)),
+      spraySessionsDone(0) {}
+
+void SprayerBot::refillTank() {
+    tankLevelL = tankCapacityL;
+    cout << name << " tank refilled to " << tankCapacityL << " L.\n";
+}
+
+bool SprayerBot::sprayArea(double areaSqM) {
+    if (!isOperational) { cout << name << " is not operational.\n"; return false; }
+    double required = areaSqM * sprayRateL_per_m2;
+    if (required > tankLevelL) {
+        cout << name << ": Insufficient chemical – need " << required
+             << " L, have " << tankLevelL << " L. Refill required.\n";
+        return false;
+    }
+    cout << name << ": Spraying " << areaSqM << " m² with "
+         << chemicalName << " [" << modeToString(mode) << "]...\n";
+    tankLevelL -= required;
+    consumeBattery(areaSqM * 0.02);
+    ++spraySessionsDone;
+    cout << "  Used " << required << " L | Tank remaining: " << tankLevelL << " L\n";
+    return true;
+}
+
+bool SprayerBot::isScheduledToday(int dayOfWeek) const {
+    for (int d : scheduleDays)
+        if (d == dayOfWeek) return true;
+    return false;
+}
+
+void SprayerBot::performTask() {
+    sprayArea(200.0);
+}
+
+void SprayerBot::statusReport() const {
+    Robot::statusReport();
+    cout << "  Mode       : " << modeToString(mode) << "\n"
+         << "  Chemical   : " << chemicalName        << "\n"
+         << "  Tank       : " << tankLevelL << " / " << tankCapacityL << " L\n"
+         << "  Spray Rate : " << sprayRateL_per_m2  << " L/m²\n"
+         << "  Sessions   : " << spraySessionsDone   << "\n";
+}
+
+/*
+Start of Child Class: HarvestBot
+Purpose: to harvest crops from Plots 
+produces report at the end 
+*/
+
+
+HarvestingBot::HarvestingBot(const string& id,
+                             const string& cropType,
+                             double binCapacityKg,
+                             double ripenessThreshold)
+    : Robot(id, "HarvestingBot-" + id),
+      cropType(cropType),
+      ripenessThreshold(ripenessThreshold),
+      binCapacityKg(binCapacityKg),
+      binCurrentKg(0.0),
+      harvests(0) {}
+
+double HarvestingBot::senseRipeness(const string& zone) const {
+    return 60.0 + (zone.size() % 4) * 10.0;
+}
+
+bool HarvestingBot::evaluateAndHarvest(const string& zone, double expectedYieldKg) {
+    if (!isOperational) { cout << name << " is not operational.\n"; return false; }
+
+    double ripeness = senseRipeness(zone);
+    cout << name << ": Scanning zone [" << zone << "] – ripeness score: "
+         << ripeness << "/100 (threshold " << ripenessThreshold << ")\n";
+
+    if (ripeness < ripenessThreshold) {
+        cout << "  Crop not yet ripe. Skipping.\n";
+        return false;
+    }
+    if (binCurrentKg + expectedYieldKg > binCapacityKg) {
+        cout << "  Bin full! Empty bin before continuing.\n";
+        return false;
+    }
+
+    cout << "  Harvesting " << expectedYieldKg << " kg of " << cropType << "...\n";
+    binCurrentKg += expectedYieldKg;
+    consumeBattery(expectedYieldKg * 0.08);
+    log.push_back({cropType, ripeness, expectedYieldKg});
+    ++harvests;
+    cout << "  Bin: " << binCurrentKg << " / " << binCapacityKg << " kg\n";
+    return true;
+}
+
+double HarvestingBot::emptyBin() {
+    double collected = binCurrentKg;
+    binCurrentKg = 0.0;
+    cout << name << ": Bin emptied – " << collected << " kg transferred.\n";
+    return collected;
+}
+
+void HarvestingBot::performTask() {
+    evaluateAndHarvest("Field-A1", 50.0);
+}
+
+void HarvestingBot::statusReport() const {
+    Robot::statusReport();
+    cout << "  Crop Type  : " << cropType          << "\n"
+         << "  Ripeness ≥ : " << ripenessThreshold  << "/100\n"
+         << "  Bin        : " << binCurrentKg << " / " << binCapacityKg << " kg\n"
+         << "  Harvests   : " << harvests            << "\n";
+    if (!log.empty()) {
+        cout << "  Harvest Log:\n";
+        for (const auto& r : log)
+            cout << "    " << r.cropType << " | ripeness " << r.ripenessScore
+                 << " | " << r.yieldKg << " kg\n";
+    }
+}
+
