@@ -1,9 +1,10 @@
+#pragma once
 #include <iostream>
 #include <string>
 #include <fstream>
 #include <sstream>
 #include <vector>
-#include <string>
+
 
 using namespace std;
 
@@ -31,14 +32,14 @@ public:
     void displaycropsinfo();
 
 
-    string getName();
-    int getTimetoGrow();
-    int getwaterRequirements();
-    int getminHumidity();
-    int getmaxHumidity();
-    int getminTemperature();
-    int getmaxTemperature();
-    int getminUVIntensity();
-    int getmaxUVIntensity();
+    string getName() const ;
+    int getTimetoGrow() const ;
+    int getwaterRequirements() const ;
+    int getminHumidity() const ;
+    int getmaxHumidity() const ;
+    int getminTemperature() const;
+    int getmaxTemperature() const ;
+    int getminUVIntensity() const;
+    int getmaxUVIntensity() const ;
 };
 

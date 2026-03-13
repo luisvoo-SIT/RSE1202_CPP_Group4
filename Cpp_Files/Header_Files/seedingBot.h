@@ -15,11 +15,9 @@ private:
 public:
     SeedingBot(const string& id, const Crop& crop);
 
-    void setCrop(const Crop& crop) { assignedCrop = crop; }
+    void setCrop(const Crop& crop){assignedCrop =crop;}
 
-    string getCropName()    const { return assignedCrop.getName();            }
-    int    getTimeToGrow()  const { return assignedCrop.getTimeToGrow();      }
-    int    getWaterNeeded() const { return assignedCrop.getWaterRequirements(); }
+
 
     void plantSeeds(int count);
 

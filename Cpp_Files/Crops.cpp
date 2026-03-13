@@ -1,4 +1,4 @@
-#include "CropsV2.h"
+#include "Header_Files/CropsV2.h"
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -84,32 +84,32 @@ void Crop::displaycropsinfo() {
          << "-------------------------------";
 }    
 
-string Crop::getName() {
+string Crop::getName() const{
     return name;
 }
-int Crop::getTimetoGrow() {
+int Crop::getTimetoGrow() const{
     return timeToGrow;
 }
-int Crop::getwaterRequirements() {
+int Crop::getwaterRequirements() const{
     return waterRequirement;
 }
-int Crop::getminHumidity() {
-        return minHumidity;
+int Crop::getminHumidity() const{
+    return minHumidity;
 }
-    int Crop::getmaxHumidity(){
-        return maxHumidity;
+int Crop::getmaxHumidity() const{
+    return maxHumidity;
     }
-    int Crop::getminTemperature(){
-        return minTemperature;
-    }
-    int Crop::getmaxTemperature(){
+int Crop::getminTemperature() const{
+    return minTemperature;
+}
+int Crop::getmaxTemperature() const {
         return maxTemperature;
     }
-    int Crop::getminUVIntensity(){
-        return minUVIntensity;
+int Crop::getminUVIntensity() const{
+    return minUVIntensity;
     }
-    int Crop::getmaxUVIntensity(){
-        return maxUVIntensity;
+int Crop::getmaxUVIntensity() const{
+    return maxUVIntensity;
     }
 
 
@@ -126,15 +126,3 @@ void testUserInput() {
 
 }
 
-int main() {    
-    vector<Crop> crops = Crop::loadCrops("Crop_Info.csv");
-    cout << "Total crops loaded: " << crops.size() << endl;
-
-    for (size_t i = 0; i < crops.size(); ++i) {
-        cout << "\n--- Crop " << i+1 << " ---\n";
-        crops[i].getName();
-    }
-
-
-    return 0;
-}
