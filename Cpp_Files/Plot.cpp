@@ -6,7 +6,7 @@
 #include <cstdlib>
 //#include "Robots.h"
 //#include "TimeControl.h"
- 
+#include "Header_Files/CropsV2.h"
 
 using namespace std;
 
@@ -31,7 +31,7 @@ struct Plot {
     float currentHum = 60.0;
 };
 
-vector<CropData> loadCrops() {
+/*vector<CropData> loadCrops() {
     vector<CropData> crops;
     ifstream file("Crop_Info.csv");
     string line;
@@ -58,7 +58,7 @@ vector<CropData> loadCrops() {
     }
     return crops;
 }
-
+*/
 void displayFarm(const vector<vector<Plot>>& farm) {
     cout << "\n--- VERTICAL FARM 3x3 SECTOR GRID ---" << endl;
     
@@ -82,7 +82,7 @@ void displayFarm(const vector<vector<Plot>>& farm) {
 }
 
 void manageFarm() {
-    vector<CropData> availableCrops = loadCrops();
+    vector<Crop> availableCrops = Crop::loadCrops("Crop_Info.csv");
     // Create 3x3 grid of Plots
     vector<vector<Plot>> farm(3, vector<Plot>(3));
 
@@ -287,8 +287,16 @@ void manageFarm() {
     }
 }
     
-
+/*
 int main() {
-    manageFarm();
+    //manageFarm();
+    vector<Crop> crops = Crop::loadCrops("Crop_Info.csv");
+    cout << "Total crops loaded: " << crops.size() << endl;
+    for (size_t i = 0; i < crops.size(); ++i) 
+    {
+        cout << "\n--- Crop " << i+1 << " ---\n";
+        cout << crops[i].getName() << endl;
+    }
     return 0;
 }
+*/

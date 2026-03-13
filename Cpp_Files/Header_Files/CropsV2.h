@@ -31,7 +31,6 @@ public:
 
     void displaycropsinfo();
 
-
     string getName() const ;
     int getTimetoGrow() const ;
     int getwaterRequirements() const ;
@@ -41,5 +40,5 @@ public:
     int getmaxTemperature() const ;
     int getminUVIntensity() const;
     int getmaxUVIntensity() const ;
-};
+    };
 

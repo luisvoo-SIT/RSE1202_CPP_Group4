@@ -29,6 +29,7 @@ vector<Crop> Crop::loadCrops(const string &filename) {
     stringstream ss(line);
     string token;
     vector<string> fields;
+    
 
     //cout<<"Type your filename"<<endl;
     //cin>>filename;
