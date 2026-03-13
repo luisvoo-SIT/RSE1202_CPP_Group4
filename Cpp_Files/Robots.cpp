@@ -8,6 +8,7 @@
 #include "Header_Files/seedingBot.h"
 #include "Header_Files/SprayerBot.h"
 #include "Header_Files/CropsV2.h"
+#include "Header_Files/HarvestBot.h"
 
 using namespace std;
 /*
@@ -120,7 +121,7 @@ SprayerBot::SprayerBot(const string& id,
       tankCapacityL(tankCapacityL),
       tankLevelL(tankCapacityL),
       sprayRateL_per_m2(sprayRate),
-      chemicalName(move(chemical)),
+      chemicalName(std::move(chemical)),
       spraySessionsDone(0) {}
 
 void SprayerBot::refillTank() {
@@ -164,10 +165,84 @@ void SprayerBot::statusReport() const {
          << "  Sessions   : " << spraySessionsDone   << "\n";
 }
 
+/*
+Start of Child Class: HarvestBot
+Purpose: to harvest crops from Plots 
+produces report at the end 
+*/
 
-int main() 
-{
-    // ── Step 1: Load crops from CSV file ─────────────────────
+
+HarvestingBot::HarvestingBot(const string& id,
+                             const string& cropType,
+                             double binCapacityKg,
+                             double ripenessThreshold)
+    : Robot(id, "HarvestingBot-" + id),
+      cropType(cropType),
+      ripenessThreshold(ripenessThreshold),
+      binCapacityKg(binCapacityKg),
+      binCurrentKg(0.0),
+      harvests(0) {}
+
+double HarvestingBot::senseRipeness(const string& zone) const {
+    return 60.0 + (zone.size() % 4) * 10.0;
+}
+
+bool HarvestingBot::evaluateAndHarvest(const string& zone, double expectedYieldKg) {
+    if (!isOperational) { cout << name << " is not operational.\n"; return false; }
+
+    double ripeness = senseRipeness(zone);
+    cout << name << ": Scanning zone [" << zone << "] – ripeness score: "
+         << ripeness << "/100 (threshold " << ripenessThreshold << ")\n";
+
+    if (ripeness < ripenessThreshold) {
+        cout << "  Crop not yet ripe. Skipping.\n";
+        return false;
+    }
+    if (binCurrentKg + expectedYieldKg > binCapacityKg) {
+        cout << "  Bin full! Empty bin before continuing.\n";
+        return false;
+    }
+
+    cout << "  Harvesting " << expectedYieldKg << " kg of " << cropType << "...\n";
+    binCurrentKg += expectedYieldKg;
+    consumeBattery(expectedYieldKg * 0.08);
+    log.push_back({cropType, ripeness, expectedYieldKg});
+    ++harvests;
+    cout << "  Bin: " << binCurrentKg << " / " << binCapacityKg << " kg\n";
+    return true;
+}
+
+double HarvestingBot::emptyBin() {
+    double collected = binCurrentKg;
+    binCurrentKg = 0.0;
+    cout << name << ": Bin emptied – " << collected << " kg transferred.\n";
+    return collected;
+}
+
+void HarvestingBot::performTask() {
+    evaluateAndHarvest("Field-A1", 50.0);
+}
+
+void HarvestingBot::statusReport() const {
+    Robot::statusReport();
+    cout << "  Crop Type  : " << cropType          << "\n"
+         << "  Ripeness ≥ : " << ripenessThreshold  << "/100\n"
+         << "  Bin        : " << binCurrentKg << " / " << binCapacityKg << " kg\n"
+         << "  Harvests   : " << harvests            << "\n";
+    if (!log.empty()) {
+        cout << "  Harvest Log:\n";
+        for (const auto& r : log)
+            cout << "    " << r.cropType << " | ripeness " << r.ripenessScore
+                 << " | " << r.yieldKg << " kg\n";
+    }
+}
+
+int main() {
+    cout << "========================================\n"
+         << "      HarvestingBot Test Program\n"
+         << "========================================\n\n";
+
+    // ── Step 1: Load crops from CSV ───────────────────────────
     vector<Crop> crops = Crop::loadCrops("Crop_Info.csv");
 
     if (crops.empty()) {
@@ -175,16 +250,15 @@ int main()
         return 1;
     }
 
-    // ── Step 2: Display all available crops ──────────────────
+    // ── Step 2: Display available crops ──────────────────────
     cout << "=== Available Crops ===\n";
     for (size_t i = 0; i < crops.size(); ++i) {
-        cout << i + 1 << ". ";
-        crops[i].displaycropsinfo();
+        cout << i + 1 << ". " << crops[i].getName() << "\n";
     }
 
-    // ── Step 3: Let user pick a crop ─────────────────────────
+    // ── Step 3: Select a crop ─────────────────────────────────
     int choice;
-    cout << "\nSelect a crop number to assign to the seeding bot: ";
+    cout << "\nSelect a crop number to harvest: ";
     cin  >> choice;
 
     if (choice < 1 || choice > (int)crops.size()) {
@@ -192,31 +266,94 @@ int main()
         return 1;
     }
 
-    // ── Step 4: Create SeedingBot with selected crop ──────────
     Crop selectedCrop = crops[choice - 1];
-    SeedingBot seeder("S01", selectedCrop);
 
-    // ── Step 5: Show robot status before task ─────────────────
-    cout << "\n=== Seeding Bot Status Before Task ===\n";
-    seeder.statusReport();
+    // ── Step 4: Create HarvestingBot ──────────────────────────
+    double binCapacity        = 300.0;
+    double ripenessThreshold  = 70.0;
 
-    // ── Step 6: Run the seeding task ──────────────────────────
-    cout << "\n=== Running Seeding Task ===\n";
-    seeder.performTask();
+    HarvestingBot harvester("H01", selectedCrop.getName(),
+                             binCapacity, ripenessThreshold);
 
-    // ── Step 7: Show robot status after task ──────────────────
-    cout << "\n=== Seeding Bot Status After Task ===\n";
-    seeder.statusReport();
+    cout << "\n========================================\n"
+         << "         Initial Status Report\n"
+         << "========================================\n";
+    harvester.statusReport();
 
-    // ── Step 8: Plant a custom number of seeds ────────────────
-    int seedCount;
-    cout << "\nHow many additional seeds to plant? ";
-    cin  >> seedCount;
-    seeder.plantSeeds(seedCount);
+    // ── Test 1: Harvest a zone that is NOT ripe ───────────────
+    cout << "\n========================================\n"
+         << "   Test 1: Harvest Unripe Zone\n"
+         << "========================================\n";
+    harvester.evaluateAndHarvest("Field-A1", 50.0);
 
-    // ── Step 9: Final status report ───────────────────────────
-    cout << "\n=== Final Status ===\n";
-    seeder.statusReport();
+    // ── Test 2: Harvest zones that ARE ripe ───────────────────
+    cout << "\n========================================\n"
+         << "   Test 2: Harvest Ripe Zones\n"
+         << "========================================\n";
+    harvester.evaluateAndHarvest("Zone-1", 60.0);
+    harvester.evaluateAndHarvest("Zone-2", 80.0);
+    harvester.evaluateAndHarvest("Zone-3", 70.0);
+
+    // ── Status after harvesting ───────────────────────────────
+    cout << "\n========================================\n"
+         << "      Status After Harvesting\n"
+         << "========================================\n";
+    harvester.statusReport();
+
+    // ── Test 3: Fill the bin to capacity ─────────────────────
+    cout << "\n========================================\n"
+         << "   Test 3: Fill Bin to Capacity\n"
+         << "========================================\n";
+    harvester.evaluateAndHarvest("Zone-4", 90.0);
+    harvester.evaluateAndHarvest("Zone-5", 90.0);
+    harvester.evaluateAndHarvest("Zone-6", 90.0);   // should trigger bin full warning
+
+    // ── Test 4: Empty the bin ─────────────────────────────────
+    cout << "\n========================================\n"
+         << "         Test 4: Empty Bin\n"
+         << "========================================\n";
+    double collected = harvester.emptyBin();
+    cout << "Total collected and transferred: " << collected << " kg\n";
+
+    // ── Test 5: Harvest again after emptying bin ──────────────
+    cout << "\n========================================\n"
+         << "   Test 5: Harvest After Emptying Bin\n"
+         << "========================================\n";
+    harvester.evaluateAndHarvest("Zone-1", 50.0);
+
+    // ── Test 6: Drain battery completely ─────────────────────
+    cout << "\n========================================\n"
+         << "      Test 6: Drain Battery\n"
+         << "========================================\n";
+    cout << "Draining battery with large harvests...\n";
+    for (int i = 0; i < 10; ++i) {
+        harvester.emptyBin();
+        harvester.evaluateAndHarvest("Zone-1", 100.0);
+    }
+
+    // ── Test 7: Try harvesting when offline ──────────────────
+    cout << "\n========================================\n"
+         << "   Test 7: Harvest When Offline\n"
+         << "========================================\n";
+    harvester.evaluateAndHarvest("Zone-1", 50.0);   // should say not operational
+
+    // ── Test 8: Recharge and try again ───────────────────────
+    cout << "\n========================================\n"
+         << "      Test 8: Recharge and Retry\n"
+         << "========================================\n";
+    harvester.recharge();
+    harvester.emptyBin();
+    harvester.evaluateAndHarvest("Zone-1", 50.0);
+
+    // ── Final status report ───────────────────────────────────
+    cout << "\n========================================\n"
+         << "         Final Status Report\n"
+         << "========================================\n";
+    harvester.statusReport();
+
+    cout << "\n========================================\n"
+         << "         All Tests Complete\n"
+         << "========================================\n";
 
     return 0;
 }
