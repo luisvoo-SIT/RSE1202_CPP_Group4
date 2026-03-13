@@ -1,20 +1,20 @@
-#include "Header_Files/MoistureControl.h"
+#include "WaterSystemControl.h"
 
-void MoistureControl::adjustMoisture(float &currentMoist)
+void WaterSystemControl::adjustWater(float &currentWater) 
 {
-    // Declare new variable for new moisture level (newMoisure)
-    double newMoisture;
+    // Declare new variable for new water level (newWater)
+    double newWater;
 
-    // Prompt user to enter new moisture level and store in newMoisture variable
-    cout << "Enter new moisture level: ";
-    cin >> setprecision(1) >> newMoisture;
+    // Prompt user to enter new water level and store in newWater variable
+    cout << "Enter new water level: ";
+    cin >> setprecision(1) >> newWater;
 
 
-    adjustActuatorLevel(newMoisture); // updates actuatorLevel in base class Actuator
-    currentMoist = newMoisture; // update current moisture level with new value
+    adjustActuatorLevel(newWater); // updates actuatorLevel in base class Actuator
+    currentWater = newWater; // update current water level with new value
 
-    // Prints updated moisture level to console
-    cout << ">>> Moisture level has been updated to: " << currentMoist << "%" << endl;
+    // Prints updated water level to console
+    cout << ">>> Water level has been updated to: " << currentWater << " litres" << endl;
 
 
 
