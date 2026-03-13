@@ -287,7 +287,7 @@ void manageFarm() {
     }
 }
     
-
+/*
 int main() {
     //manageFarm();
     vector<Crop> crops = Crop::loadCrops("Crop_Info.csv");
@@ -299,3 +299,4 @@ int main() {
     }
     return 0;
 }
+*/
