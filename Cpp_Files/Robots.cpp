@@ -8,6 +8,7 @@
 #include "Header_Files/seedingBot.h"
 #include "Header_Files/SprayerBot.h"
 #include "Header_Files/CropsV2.h"
+#include "Header_Files/HarvestBot.h"
 
 using namespace std;
 /*
@@ -120,7 +121,7 @@ SprayerBot::SprayerBot(const string& id,
       tankCapacityL(tankCapacityL),
       tankLevelL(tankCapacityL),
       sprayRateL_per_m2(sprayRate),
-      chemicalName(move(chemical)),
+      chemicalName(std::move(chemical)),
       spraySessionsDone(0) {}
 
 void SprayerBot::refillTank() {
@@ -164,59 +165,75 @@ void SprayerBot::statusReport() const {
          << "  Sessions   : " << spraySessionsDone   << "\n";
 }
 
+/*
+Start of Child Class: HarvestBot
+Purpose: to harvest crops from Plots 
+produces report at the end 
+*/
 
-int main() 
-{
-    // ── Step 1: Load crops from CSV file ─────────────────────
-    vector<Crop> crops = Crop::loadCrops("Crop_Info.csv");
 
-    if (crops.empty()) {
-        cout << "No crops loaded. Check your CSV file.\n";
-        return 1;
-    }
+HarvestingBot::HarvestingBot(const string& id,
+                             const string& cropType,
+                             double binCapacityKg,
+                             double ripenessThreshold)
+    : Robot(id, "HarvestingBot-" + id),
+      cropType(cropType),
+      ripenessThreshold(ripenessThreshold),
+      binCapacityKg(binCapacityKg),
+      binCurrentKg(0.0),
+      harvests(0) {}
 
-    // ── Step 2: Display all available crops ──────────────────
-    cout << "=== Available Crops ===\n";
-    for (size_t i = 0; i < crops.size(); ++i) {
-        cout << i + 1 << ". ";
-        crops[i].displaycropsinfo();
-    }
-
-    // ── Step 3: Let user pick a crop ─────────────────────────
-    int choice;
-    cout << "\nSelect a crop number to assign to the seeding bot: ";
-    cin  >> choice;
-
-    if (choice < 1 || choice > (int)crops.size()) {
-        cout << "Invalid choice.\n";
-        return 1;
-    }
-
-    // ── Step 4: Create SeedingBot with selected crop ──────────
-    Crop selectedCrop = crops[choice - 1];
-    SeedingBot seeder("S01", selectedCrop);
-
-    // ── Step 5: Show robot status before task ─────────────────
-    cout << "\n=== Seeding Bot Status Before Task ===\n";
-    seeder.statusReport();
-
-    // ── Step 6: Run the seeding task ──────────────────────────
-    cout << "\n=== Running Seeding Task ===\n";
-    seeder.performTask();
-
-    // ── Step 7: Show robot status after task ──────────────────
-    cout << "\n=== Seeding Bot Status After Task ===\n";
-    seeder.statusReport();
-
-    // ── Step 8: Plant a custom number of seeds ────────────────
-    int seedCount;
-    cout << "\nHow many additional seeds to plant? ";
-    cin  >> seedCount;
-    seeder.plantSeeds(seedCount);
-
-    // ── Step 9: Final status report ───────────────────────────
-    cout << "\n=== Final Status ===\n";
-    seeder.statusReport();
-
-    return 0;
+double HarvestingBot::senseRipeness(const string& zone) const {
+    return 60.0 + (zone.size() % 4) * 10.0;
 }
+
+bool HarvestingBot::evaluateAndHarvest(const string& zone, double expectedYieldKg) {
+    if (!isOperational) { cout << name << " is not operational.\n"; return false; }
+
+    double ripeness = senseRipeness(zone);
+    cout << name << ": Scanning zone [" << zone << "] – ripeness score: "
+         << ripeness << "/100 (threshold " << ripenessThreshold << ")\n";
+
+    if (ripeness < ripenessThreshold) {
+        cout << "  Crop not yet ripe. Skipping.\n";
+        return false;
+    }
+    if (binCurrentKg + expectedYieldKg > binCapacityKg) {
+        cout << "  Bin full! Empty bin before continuing.\n";
+        return false;
+    }
+
+    cout << "  Harvesting " << expectedYieldKg << " kg of " << cropType << "...\n";
+    binCurrentKg += expectedYieldKg;
+    consumeBattery(expectedYieldKg * 0.08);
+    log.push_back({cropType, ripeness, expectedYieldKg});
+    ++harvests;
+    cout << "  Bin: " << binCurrentKg << " / " << binCapacityKg << " kg\n";
+    return true;
+}
+
+double HarvestingBot::emptyBin() {
+    double collected = binCurrentKg;
+    binCurrentKg = 0.0;
+    cout << name << ": Bin emptied – " << collected << " kg transferred.\n";
+    return collected;
+}
+
+void HarvestingBot::performTask() {
+    evaluateAndHarvest("Field-A1", 50.0);
+}
+
+void HarvestingBot::statusReport() const {
+    Robot::statusReport();
+    cout << "  Crop Type  : " << cropType          << "\n"
+         << "  Ripeness ≥ : " << ripenessThreshold  << "/100\n"
+         << "  Bin        : " << binCurrentKg << " / " << binCapacityKg << " kg\n"
+         << "  Harvests   : " << harvests            << "\n";
+    if (!log.empty()) {
+        cout << "  Harvest Log:\n";
+        for (const auto& r : log)
+            cout << "    " << r.cropType << " | ripeness " << r.ripenessScore
+                 << " | " << r.yieldKg << " kg\n";
+    }
+}
+
