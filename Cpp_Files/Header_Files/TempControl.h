@@ -1,6 +1,6 @@
 #ifndef TEMPCONTROL_H
 #define TEMPCONTROL_H
-#include "Header_Files/Actuators.h"
+#include "Actuators.h"
 
 // Derived class: TempControl
 class TempControl : public Actuator

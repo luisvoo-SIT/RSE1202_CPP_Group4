@@ -1,6 +1,6 @@
 #ifndef UVCONTROL_H
 #define UVCONTROL_H
-#include "Header_Files/Actuators.h"
+#include "Actuators.h"
 
 // Derived class: UVControl
 class UVControl : public Actuator
