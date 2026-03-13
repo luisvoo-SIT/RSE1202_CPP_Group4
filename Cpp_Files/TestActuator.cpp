@@ -1,33 +1,95 @@
-#include "WateringSystem.h"
+/*
+// @Ethan this one is to be integrated into Plot.cpp 
+
+#include "MoistureControl.h"
+#include "TempControl.h"
+#include "HumidityControl.h"
+#include "UvControl.h"
+
+
+
+
 
 int main()
 {
-    // Clear console screen
-    system("cls"); 
+    system("cls"); // clear console for better readability
+    // default environment variables
+    float currentMoist = 60.0f;
+    float currentTemp = 20.0f; 
+    float currentHum = 60.0f; 
+    float currentUV = 10.0f;
+    
+    int choice; // int variable for storing user input for choice of actuator (1-4)
+    do
+    {
+        cout << "\n=== Actuator Control System ===" << endl;
+        cout << "Displaying current environment data:" << endl;
+        cout << "  Moisture    : " << currentMoist << "%" << endl;
+        cout << "  Temperature : " << currentTemp  << " C" << endl;
+        cout << "  Humidity    : " << currentHum   << "%" << endl;
+        cout << "  UV Light    : " << currentUV    << " units" << endl;
 
-    // Create object of watering system class
-    WateringSystem ws;
+        cout << "\nSelect actuator to adjust:" << endl;
+        cout << "  1) Moisture Control" << endl;
+        cout << "  2) Temperature Control" << endl;
+        cout << "  3) Humidity Control" << endl;
+        cout << "  4) UV Light Control" << endl;
+        cout << "  0) Exit" << endl;
+        cout << "\nChoice: ";
+        cin >> choice;
 
-    // Display inital watering system level
-    ws.displayActuatorLevel();
+        switch (choice)
+        {
+            case 1:
+            {
+                MoistureControl mc;                 // create object of moisture control class
+                mc.adjustMoisture(currentMoist);    // call function to adjust moisture level
+                break;
 
-    // Simulating soil moisture level via manual user input
-    int moistureLevel;
-    cout << "\n>>>Enter soil moisture level (0-100%): ";
-    cin >> moistureLevel;
+            }
 
-    // Display current soil moisture level
-    cout << "\n>>>Current soil moisture level is: " << moistureLevel << "%" << endl;
+            case 2:
+            { 
+                TempControl tc;                 // create object of moisture control class
+                tc.adjustTemperature(currentTemp);    // call function to adjust temperature level
+                break;
 
-    // Watering system adjust watering level based on soil moisture level (simulated via user input)
-    ws.adjustWateringLevel(moistureLevel);
+            }
 
-    // Display updated watering system level
-    ws.displayActuatorLevel();
+            case 3:
+            {
+                HumidityControl hc;                 // create object of humidity control class
+                hc.adjustHumidity(currentHum);    // call function to adjust humidity level
+                break;
+            }
 
-    // Exit message
-    cout << "\n>>> Goodbye for now :)\n" << endl;
+            case 4:
+            {
+                UVControl uv;                 // create object of UV control class
+                uv.adjustUV(currentUV);    // call function to adjust UV level
+                break;
+            }
+            
+            case 0: 
+                cout << "Exiting Actuator Control" << endl;
+                break;
 
+            default: 
+                cout << "Invalid choice. Please try again (0-4)" << endl;
+
+
+        }
+
+
+
+    }
+    
+    while (choice !=0);
+    
     return 0;
-
+    
+    
 }
+
+
+*/
