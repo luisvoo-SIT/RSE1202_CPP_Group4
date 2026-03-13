@@ -8,13 +8,13 @@
 
 
 
-
+// @Ethan this one is to be integrated into Plot.cpp 
 
 int main()
 {
     system("cls"); // clear console for better readability
     // default environment variables
-    float currentMoist = 60.0f;
+    float currentWaterlvl = 4.0f;
     float currentTemp = 20.0f; 
     float currentHum = 60.0f; 
     float currentUV = 10.0f;
@@ -24,17 +24,17 @@ int main()
     {
         cout << "\n=== Actuator Control System ===" << endl;
         cout << "Displaying current environment data:" << endl;
-        cout << "  Moisture    : " << currentMoist << "%" << endl;
+        cout << "  Water Level : " << currentWaterlvl << " litres" << endl;
         cout << "  Temperature : " << currentTemp  << " C" << endl;
-        cout << "  Humidity    : " << currentHum   << "%" << endl;
+        cout << "  Humidity    : " << currentHum   << " %" << endl;
         cout << "  UV Light    : " << currentUV    << " units" << endl;
 
         cout << "\nSelect actuator to adjust:" << endl;
-        cout << "  1) Moisture Control" << endl;
+        cout << "  1) Water System Control" << endl;
         cout << "  2) Temperature Control" << endl;
         cout << "  3) Humidity Control" << endl;
         cout << "  4) UV Light Control" << endl;
-        cout << "  0) Exit" << endl;
+        cout << "  5) Exit" << endl;
         cout << "\nChoice: ";
         cin >> choice;
 
@@ -42,8 +42,8 @@ int main()
         {
             case 1:
             {
-                MoistureControl mc;                 // create object of moisture control class
-                mc.adjustMoisture(currentMoist);    // call function to adjust moisture level
+                WaterSystemControl wsc;                 // create object of water system control class
+                wsc.adjustWater(currentWaterlvl);    // call function to adjust water level
                 break;
 
             }
@@ -70,12 +70,12 @@ int main()
                 break;
             }
             
-            case 0: 
+            case 5: 
                 cout << "Exiting Actuator Control" << endl;
                 break;
 
             default: 
-                cout << "Invalid choice. Please try again (0-4)" << endl;
+                cout << "Invalid choice. Please try again (1-5)" << endl;
 
 
         }
@@ -84,7 +84,7 @@ int main()
 
     }
     
-    while (choice !=0);
+    while (choice !=5);
     
     return 0;
     
