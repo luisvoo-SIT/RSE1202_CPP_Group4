@@ -6,12 +6,17 @@
 #include <cstdlib>
 //#include "Robots.h"
 //#include "TimeControl.h"
+#include "Header_Files/WaterSystemControl.h" //dino water
 #include "Header_Files/CropsV2.h"
+//#include "Header_Files/Actuators.h"
+#include "Header_Files/plotv2.h"
 
 using namespace std;
 
 //global variables:
 int farmchoice = 0;
+WaterSystemControl wsc;
+
 
 // Stores the requirements for each crop from crops.csv
 struct CropData {
@@ -23,15 +28,7 @@ struct CropData {
     int timeToGrow;
 };
 
-// Represents one 3x3 Sector
-struct Plot {
-    string cropName = "Empty";
-    char symbol = ' ';
-    float currentTemp = 20.0;
-    float currentHum = 60.0;
-};
-
-/*vector<CropData> loadCrops() {
+vector<CropData> loadCrops() {
     vector<CropData> crops;
     ifstream file("Crop_Info.csv");
     string line;
@@ -58,7 +55,7 @@ struct Plot {
     }
     return crops;
 }
-*/
+
 void displayFarm(const vector<vector<Plot>>& farm) {
     cout << "\n--- VERTICAL FARM 3x3 SECTOR GRID ---" << endl;
     
@@ -82,7 +79,7 @@ void displayFarm(const vector<vector<Plot>>& farm) {
 }
 
 void manageFarm() {
-    vector<Crop> availableCrops = Crop::loadCrops("Crop_Info.csv");
+    vector<CropData> availableCrops = loadCrops();
     // Create 3x3 grid of Plots
     vector<vector<Plot>> farm(3, vector<Plot>(3));
 
@@ -91,7 +88,6 @@ void manageFarm() {
 
     while (choice != 8) {
         displayFarm(farm);
-        //cout << "\n1. View Plot Layout\n2. Plant Crop\n3. Water Crop\n4. Harvest Crop\n5. Time Skip\n6. Return to Main Menu\n7. View Plot Layout\nChoice: ";
         cout << "\n1. View Plot\n2. Return to Main Menu\n   Choice: ";
         cin >> choice;
 
@@ -178,22 +174,25 @@ void manageFarm() {
 
             while (true) {
                 cout << "\nEnter Plot ID to view (1-9) or 0 to return: ";
-                cin >> plotId;
-
-                // Escape condition
-                if (plotId == 0) {
-                    cout << "Returning to menu..." << endl;
-                    break; 
+                
+                if (!(cin >> plotId)) {
+                    cin.clear();
+                    cin.ignore(1000, '\n');
+                    cout << "Invalid input. Please enter a number between 1 and 9 (or 0 to return)." << endl;
+                    continue;
                 }
 
-                // Validation
+                if (plotId == 0) {
+                    cout << "Returning to menu..." << endl;
+                    break;
+                }
+
                 if (plotId < 1 || plotId > 9) {
-                    if (cin.fail()) {
-                        cin.clear();
-                        cin.ignore(1000, '\n');
-                    }
-                    cout << "Invalid Plot ID. Try again." << endl;
-                } else {
+                    cout << "Invalid Plot ID. Please enter a number between 1 and 9 (or 0 to return)." << endl;
+                    continue;
+                }
+                
+                else {
                     a++;
                     // Convert valid Plot ID to indices
                     int r = (plotId - 1) / 3;
@@ -217,6 +216,8 @@ void manageFarm() {
                     cout << "Crop Name:   " << farm[r][c].cropName << endl;
                     cout << "Temperature: " << farm[r][c].currentTemp << "°C" << endl;
                     cout << "Humidity:    " << farm[r][c].currentHum << "%" << endl;
+                    cout << "Water Level: " << farm[r][c].currentWater << endl;
+                    //add day, global day variable
                     cout << "-------------------------------" << endl;
 
                     cout << "Press Enter to return to menu...";
@@ -230,11 +231,12 @@ void manageFarm() {
                         cout << "3. Apply Pesticide" << endl;
                         cout << "4. View Other Plots" << endl;
                         cout << "5. Skip the Day" << endl;
-                        cout << "6. Return to Menu" << endl << endl;
+                        cout << "6. Water Plants" << endl;
+                        cout << "7. Return to Main Menu" << endl << endl;
                         cout << "Select Your Option: ";
                         cin >> farmchoice;
 
-                        if (farmchoice < 1 || farmchoice > 9) {
+                        if (farmchoice < 1 || farmchoice > 7) {
                             if (cin.fail()) {
                                 cin.clear();
                                 cin.ignore(1000, '\n');
@@ -243,36 +245,47 @@ void manageFarm() {
                         }
                     
                         else {
-                                switch (farmchoice)
-                                {
-                                    case 1: //call planting robot
-                                        cout << "Planting new crop" << endl;
-                                        //plantrobot();
-                                        break;
-                                    case 2: //call harvesting robot 
-                                        cout << "harvest da crop" << endl;
-                                        //harvestbot();
-                                        break;
-                                    case 3: //call pesticide robot
-                                        cout << "deleting pests" << endl;
-                                        //pestbot();
-                                        break;
-                                    case 4: //viewing other plots
-                                        cout << "viewing plots" << endl;    
-                                        manageFarm();
-                                        break;
-                                    case 5: //time skip (1 day increments)
-                                        cout << "zzzzz" << endl;
-                                        //time++;
-                                        break;
-                                    case 6: //back to main menu
-                                        cout << "menu" << endl;
-                                        //mainmenu.cpp
-                                        break;
-                                    default:
-                                        break;
-                                }
+                            switch (farmchoice)
+                            {
+                                case 1: //call planting robot
+                                    cout << "Planting new crop" << endl;
+                                    //plantrobot();
+                                    //manageFarm();
+                                    break;
+                                case 2: //call harvesting robot 
+                                    cout << "harvest da crop" << endl;
+                                    //harvestbot();
+                                   // manageFarm();
+                                    break;
+                                case 3: //call pesticide robot
+                                    cout << "deleting pests" << endl;
+                                    //pestbot();
+                                    //manageFarm();
+                                    break;
+                                case 4: //viewing other plots
+                                    cout << "viewing plots" << endl;    
+                                   // manageFarm();
+                                    break;
+                                case 5: //time skip (1 day increments)
+                                    cout << "zzzzz" << endl;
+                                    //time++;
+                                    //manageFarm();
+                                    break;
+                                case 6: //watering plants
+                                    cout << "feeeeeeeeed" << endl;
+                                    if (farm[r][c].cropName != " "){ //if (farm[r][c].cropName != "Empty") - replace current statement w this once seeding bot is working:
+                                        cout << "feed me" << endl;
+                                        wsc.adjustWater(farm[r][c].currentWater); //dinowater
+                                        //manageFarm();
+                                    }
+                                    else{
+                                        cout << "No crop to water." << endl;
+                                    }
+                                    break;
+                                default:
+                                    break;
                             }
+                        }
                         break;
                     } 
 
@@ -286,17 +299,36 @@ void manageFarm() {
         }
     }
 }
-    
+  
+//put this in plots.h
 /*
-int main() {
-    //manageFarm();
-    vector<Crop> crops = Crop::loadCrops("Crop_Info.csv");
-    cout << "Total crops loaded: " << crops.size() << endl;
-    for (size_t i = 0; i < crops.size(); ++i) 
-    {
-        cout << "\n--- Crop " << i+1 << " ---\n";
-        cout << crops[i].getName() << endl;
+int cropstatus(cropstatus){ //eventually transition to enum for easier reading
+    int warning == 0;
+
+    if (timeToGrow > time status){ //seedling status
+        cropstatus = "seed"        
     }
-    return 0;
+    else if (timeToGrow <= time status) { //harvestable crop status
+        cropstatus = "plant" 
+    }
+    //condition: drowning/not enough water - after 2 days crop  d i e s
+    else if (currentWaterlvl >= waterReq || currentWaterlvl < waterReq ) { //dead, need import from actuator
+        warning ++;
+        cout << "Your crop is dying." << endl;;
+            if (warning >= 2){
+                cropstatus = "dead";
+                warning == 0;
+            }
+    }
+    else { //no status 
+        cropstatus = "no plants in plot"
+    }
+return cropstatus;
 }
 */
+//change function name
+int main() {
+    manageFarm();
+
+    return 0;
+}
