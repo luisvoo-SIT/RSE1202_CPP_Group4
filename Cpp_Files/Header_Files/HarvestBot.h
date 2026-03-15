@@ -7,39 +7,36 @@ using namespace std;
 
 class HarvestingBot : public Robot {
 public:
-    static constexpr double DEFAULT_RIPENESS_THRESHOLD = 75.0;
+    enum class PlantStatus { SEED, PLANT, DEAD };
 
 private:
     struct HarvestRecord {
-        string cropType;
-        double ripenessScore;
-        double yieldKg;
+        string      cropType;
+        PlantStatus status;
+        double      yieldKg;
     };
 
-    string              cropType;
-    double              ripenessThreshold;
-    double              binCapacityKg;
-    double              binCurrentKg;
-    int                 harvests;
+    string                cropType;
+    double                totalHarvestedKg;
+    double                totalDeadKg;
+    double                totalPlantKg;
+    int                   harvests;
     vector<HarvestRecord> log;
 
-    double senseRipeness(const string& zone) const;
+    static string statusToString(PlantStatus status);
 
 public:
-    HarvestingBot(const string& id,
-                  const string& cropType,
-                  double binCapacityKg     = 200.0,
-                  double ripenessThreshold = DEFAULT_RIPENESS_THRESHOLD);
+    HarvestingBot(const string& id, const string& cropType);
 
-    void setCropType(const string& crop) { cropType          = crop; }
-    void setRipenessThreshold(double t)  { ripenessThreshold = t;    }
+    void setCropType(const string& crop) { cropType = crop; }
 
-    bool   evaluateAndHarvest(const string& zone, double expectedYieldKg);
-    double emptyBin();
+    bool evaluateAndHarvest(const string& zone,
+                            double        expectedYieldKg,
+                            PlantStatus   status);
+    void statusReport() const;
 
-    void performTask()        override;
-    void statusReport() const override;
-
-    double getBinLevel() const { return binCurrentKg; }
-    int    getHarvests() const { return harvests;     }
+    double getTotalHarvested() const { return totalHarvestedKg; }
+    double getTotalDead()      const { return totalDeadKg;       }
+    double getTotalPlant()     const { return totalPlantKg;      }
+    int    getHarvests()       const { return harvests;           }
 };
