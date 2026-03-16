@@ -4,8 +4,8 @@
 #include <string>
 #include <sstream>
 #include <cstdlib>
-//#include "Robots.h"
-//#include "TimeControl.h"
+#include "Header_Files/Robots.h"
+//#include "Header_Files/TimeControl.h"
 #include "Header_Files/WaterSystemControl.h" //dino water
 #include "Header_Files/CropsV2.h"
 //#include "Header_Files/Actuators.h"
@@ -16,6 +16,7 @@ using namespace std;
 //global variables:
 int farmchoice = 0;
 WaterSystemControl wsc;
+//SeedingBot sbot; do i need a global variable to make the bots work?
 
 /*
 // Stores the requirements for each crop from crops.csv
@@ -250,35 +251,53 @@ void manageFarm() {
                             switch (farmchoice)
                             {
                                 case 1: //call planting robot
-                                    cout << "Planting new crop" << endl;
+                                    cout << "planting new crop" << endl;
                                     //plantrobot();
                                     //manageFarm();
+                                    if (farm[r][c].cropName == "Empty"){ //if (farm[r][c].cropName != "Empty") - replace current statement w this once seeding bot is working:
+                                        cout << "we need da plant" << endl;
+                                        //cheehui seeding bot
+                                        //SeedingBot(); 
+                                    }
+                                    else{
+                                        cout << "Plot already has a crop." << endl;
+                                    }
                                     break;
                                 case 2: //call harvesting robot 
                                     cout << "harvest da crop" << endl;
-                                    //harvestbot();
-                                   // manageFarm();
+                                   if (farm[r][c].cropName != "Empty"){ 
+                                        cout << "take me" << endl;
+                                        //cheehui harvest bot;
+                                        //HarvestingBot();
+                                    }
+                                    else{
+                                        cout << "No crop to harvest." << endl;
+                                    }
                                     break;
                                 case 3: //call pesticide robot
                                     cout << "deleting pests" << endl;
-                                    //pestbot();
-                                    //manageFarm();
+                                    if (farm[r][c].cropName != "Empty"){ 
+                                        cout << "clean me" << endl;
+                                        //cheehui pest bot;
+                                        //PesticideBot();
+                                    }
+                                    else{
+                                        cout << "No crop to apply pesticide." << endl;
+                                    }     
                                     break;
                                 case 4: //viewing other plots
-                                    cout << "viewing plots" << endl;    
-                                   // manageFarm();
+                                    cout << "viewing plots" << endl;                                      
                                     break;
-                                case 5: //time skip (1 day increments)
+                                case 5: //time skip (x day increments)
                                     cout << "zzzzz" << endl;
                                     //time++;
-                                    //manageFarm();
+                                    
                                     break;
                                 case 6: //watering plants
                                     cout << "feeeeeeeeed" << endl;
-                                    if (farm[r][c].cropName != " "){ //if (farm[r][c].cropName != "Empty") - replace current statement w this once seeding bot is working:
+                                    if (farm[r][c].cropName != "Empty"){ //if (farm[r][c].cropName != "Empty") - replace current statement w this once seeding bot is working:
                                         cout << "feed me" << endl;
                                         wsc.adjustWater(farm[r][c].currentWater); //dinowater
-                                        //manageFarm();
                                     }
                                     else{
                                         cout << "No crop to water." << endl;
