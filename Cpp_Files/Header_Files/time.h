@@ -1,21 +1,19 @@
-class Time {
+#pragma once
+#include <iostream>
+using namespace std;
 
-protected{
-    int plotTime
-    int GlobalTime
-}
+class TimeControl {
+private:
+    int PlotTime;
+    int GlobalTime;
 
-void timeSkip();
-int plotTime(int x,vector<vector<Plot>>& farm){
-    farm[r][c].time += x;
+public:
+    TimeControl();
 
-    return x;
+    void advanceTime();
+    void resetTime();
+    void displayTime() const;
 
-
-
+    int getDay() const;
+    int getSeason() const;
 };
-void GlobalTime(int x)
-void clear_plotTime(int x)
-void clear_GlobalTime(int x)
-
-}
