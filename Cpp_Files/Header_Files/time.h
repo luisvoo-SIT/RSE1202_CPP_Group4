@@ -10,10 +10,8 @@ private:
 public:
     TimeControl();
 
-    void advanceTime();
-    void resetTime();
-    void displayTime() const;
-
-    int getDay() const;
-    int getSeason() const;
+    void advancePlotTime();
+    void resetPlotTime();
+    int getPlotTime() const;
+    int getGlobalTime() const;
 };

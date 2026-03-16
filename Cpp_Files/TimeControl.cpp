@@ -11,6 +11,7 @@ void TimeControl::advancePlotTime() {
 
 void TimeControl::resetPlotTime() {
     PlotTime = 0;
+    
 }
 
 void TimeControl::advanceGlobalTime() {
