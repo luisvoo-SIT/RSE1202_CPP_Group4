@@ -4,10 +4,10 @@
 #include <string>
 #include <sstream>
 #include <cstdlib>
-#include "Header_Files/Robots.h"
+#include "Header_Files/Robots.h" //chee hui's bot functions
 //#include "Header_Files/TimeControl.h"
 #include "Header_Files/WaterSystemControl.h" //dino water
-#include "Header_Files/CropsV2.h"
+#include "Header_Files/CropsV2.h" //luis' crop data
 //#include "Header_Files/Actuators.h"
 #include "Header_Files/plotv2.h"
 
@@ -18,45 +18,9 @@ int farmchoice = 0;
 WaterSystemControl wsc;
 //SeedingBot sbot; do i need a global variable to make the bots work?
 
-/*
-// Stores the requirements for each crop from crops.csv
-struct CropData {
-    string name;
-    int minHum, maxHum;
-    int minTemp, maxTemp;
-    int minUV, maxUV;
-    double waterReq;
-    int timeToGrow;
-};
-
-
-vector<CropData> loadCrops() {
-    vector<CropData> crops;
-    ifstream file("Crop_Info.csv");
-    string line;
-
-    // Skip the header row
-    getline(file, line);
-
-    while (getline(file, line)) {
-        stringstream ss(line);
-        CropData c;
-        string temp;
-
-        getline(ss, c.name, ',');
-        getline(ss, temp, ','); c.minHum = stoi(temp);
-        getline(ss, temp, ','); c.maxHum = stoi(temp);
-        getline(ss, temp, ','); c.minTemp = stoi(temp);
-        getline(ss, temp, ','); c.maxTemp = stoi(temp);
-        getline(ss, temp, ','); c.minUV = stoi(temp);
-        getline(ss, temp, ','); c.maxUV = stoi(temp);
-        getline(ss, temp, ','); c.waterReq = stod(temp);
-        getline(ss, temp, ','); c.timeToGrow = stoi(temp);
-
-        crops.push_back(c);
-    }
-    return crops;
-}*/
+//global vector initialization:
+vector<CropData> availableCrops = CropData::loadCrops();
+vector<vector<Plot>> farm(3, vector<Plot>(3));
 
 void displayFarm(const vector<vector<Plot>>& farm) {
     cout << "\n--- VERTICAL FARM 3x3 SECTOR GRID ---" << endl;
@@ -81,13 +45,8 @@ void displayFarm(const vector<vector<Plot>>& farm) {
 }
 
 void manageFarm() {
-    
-    vector<CropData> availableCrops = CropData::loadCrops();
-    // Create 3x3 grid of Plots
-    vector<vector<Plot>> farm(3, vector<Plot>(3));
 
     int choice = 0;
-    int a, b = 0; //for error handling, not working
 
     while (choice != 8) {
         displayFarm(farm);
@@ -196,7 +155,6 @@ void manageFarm() {
                 }
                 
                 else {
-                    a++;
                     // Convert valid Plot ID to indices
                     int r = (plotId - 1) / 3;
                     int c = (plotId - 1) % 3;
@@ -214,12 +172,15 @@ void manageFarm() {
                         cout << endl;
                     }
 
-                    // Display the metadata
+                    // Display the metadata -- override w chee hui's
                     cout << "-------------------------------" << endl;
+                    /*
                     cout << "Crop Name:   " << farm[r][c].cropName << endl;
                     cout << "Temperature: " << farm[r][c].currentTemp << "°C" << endl;
                     cout << "Humidity:    " << farm[r][c].currentHum << "%" << endl;
                     cout << "Water Level: " << farm[r][c].currentWater << endl;
+                    */
+
                     //add day, global day variable
                     cout << "-------------------------------" << endl;
 
@@ -321,35 +282,35 @@ void manageFarm() {
     }
 }
   
-//put this in plots.h
-/*
-int cropstatus(cropstatus){ //eventually transition to enum for easier reading
-    int warning == 0;
+enum Status { SEED, PLANT, DEAD };
 
-    if (timeToGrow > time status){ //seedling status
-        cropstatus = "seed"        
+int cropstatus (int i, int r, int c) { //need to add time parameter 
+    int warning = 0; 
+    
+    availableCrops[i].getWaterReq(); //get water requirement for specific crop
+    if (farm[r][c].currentWater <= (availableCrops[i].getWaterReq() + 5) || (farm[r][c].currentWater > (availableCrops[i].getWaterReq() - 5))) { //if current water level is not within 5 units of water requirement, crop is dying
+        warning++;
+        cout << "Your crop is dying." << endl;
     }
-    else if (timeToGrow <= time status) { //harvestable crop status
-        cropstatus = "plant" 
+    else {  
+        warning = 0; //reset warning if water level is good
     }
-    //condition: drowning/not enough water - after 2 days crop  d i e s
-    else if (currentWaterlvl >= waterReq || currentWaterlvl < waterReq ) { //dead, need import from actuator
-        warning ++;
-        cout << "Your crop is dying." << endl;;
-            if (warning >= 2){
-                cropstatus = "dead";
-                warning == 0;
-            }
+
+    //logic for plot statuses
+    if (warning == 2) { //if warning reaches 2, crop dies
+        return DEAD;
     }
-    else { //no status 
-        cropstatus = "no plants in plot"
+    else if (plottime < availableCrops[i].getTimeToGrow()) { //if time is less than time to grow, crop is a seedling
+        return SEED;
     }
-return cropstatus;
+    else if (plottime >= availableCrops[i].getTimeToGrow()) { //if time is greater than or equal to time to grow, crop is harvestable
+        return PLANT;
+    }
+    else cout << "No crop." << endl;  
 }
-*/
+
 //change function name
 int main() {
     manageFarm();
-
     return 0;
 }
