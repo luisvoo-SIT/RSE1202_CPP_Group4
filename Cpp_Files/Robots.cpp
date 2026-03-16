@@ -201,27 +201,9 @@ void HarvestingBot::statusReport() const {
 
     if (!log.empty()) {
         cout << "  Harvest Log:\n";
-
-        cout << "    [Plant Harvests]\n";
-        bool anyPlant = false;
-        for (const auto& r : log) {
-            if (r.status == PlantStatus::PLANT) {
-                cout << "      " << r.cropType
-                     << " | "   << r.yieldKg << " kg\n";
-                anyPlant = true;
-            }
-        }
-        if (!anyPlant) cout << "      (none)\n";
-
-        cout << "    [Dead Harvests]\n";
-        bool anyDead = false;
-        for (const auto& r : log) {
-            if (r.status == PlantStatus::DEAD) {
-                cout << "      " << r.cropType
-                     << " | "   << r.yieldKg << " kg\n";
-                anyDead = true;
-            }
-        }
-        if (!anyDead) cout << "      (none)\n";
+        for (const auto& r : log)
+            cout << "    " << r.cropType << " | ripeness " << r.ripenessScore
+                 << " | " << r.yieldKg << " kg\n";
     }
 }
+

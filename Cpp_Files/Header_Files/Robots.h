@@ -14,6 +14,11 @@ public:
 
     void statusReport() const;
 
-    const string& getName() const { return name; }
-    const string& getId()   const { return id;   }
+    bool          getIsOperational() const { return isOperational; }
+    double        getBatteryLevel()  const { return batteryLevel;  }
+    const string& getName()          const { return name;          }
+
+
+
+
 };
