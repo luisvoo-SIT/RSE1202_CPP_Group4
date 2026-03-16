@@ -93,8 +93,9 @@ void testUserInput() {
 
 }
 */
-
+/*
 int main(){
     vector<CropData> availableCrops = CropData::loadCrops();
     cout<<CropData::getName();
 }
+*/
