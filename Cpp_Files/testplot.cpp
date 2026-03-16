@@ -17,7 +17,7 @@ using namespace std;
 int farmchoice = 0;
 WaterSystemControl wsc;
 
-
+/*
 // Stores the requirements for each crop from crops.csv
 struct CropData {
     string name;
@@ -27,6 +27,7 @@ struct CropData {
     double waterReq;
     int timeToGrow;
 };
+
 
 vector<CropData> loadCrops() {
     vector<CropData> crops;
@@ -54,7 +55,7 @@ vector<CropData> loadCrops() {
         crops.push_back(c);
     }
     return crops;
-}
+}*/
 
 void displayFarm(const vector<vector<Plot>>& farm) {
     cout << "\n--- VERTICAL FARM 3x3 SECTOR GRID ---" << endl;
@@ -79,7 +80,8 @@ void displayFarm(const vector<vector<Plot>>& farm) {
 }
 
 void manageFarm() {
-    vector<CropData> availableCrops = loadCrops();
+    
+    vector<CropData> availableCrops = CropData::loadCrops();
     // Create 3x3 grid of Plots
     vector<vector<Plot>> farm(3, vector<Plot>(3));
 
