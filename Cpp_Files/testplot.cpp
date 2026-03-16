@@ -10,6 +10,7 @@
 #include "Header_Files/CropsV2.h" //luis' crop data
 //#include "Header_Files/Actuators.h"
 #include "Header_Files/plotv2.h"
+//#include "Header_Files/time.h" //time variables
 
 using namespace std;
 
@@ -179,6 +180,7 @@ void manageFarm() {
                     cout << "Temperature: " << farm[r][c].currentTemp << "°C" << endl;
                     cout << "Humidity:    " << farm[r][c].currentHum << "%" << endl;
                     cout << "Water Level: " << farm[r][c].currentWater << endl;
+                    cout << "Time Planted: " <<  << " days" << endl;
                     */
 
                     //add day, global day variable
@@ -218,7 +220,8 @@ void manageFarm() {
                                     if (farm[r][c].cropName == "Empty"){ //if (farm[r][c].cropName != "Empty") - replace current statement w this once seeding bot is working:
                                         cout << "we need da plant" << endl;
                                         //cheehui seeding bot
-                                        //SeedingBot(); 
+                                        //SeedingBot();
+                                        //initialize time object, and run the plotTime ++ function
                                     }
                                     else{
                                         cout << "Plot already has a crop." << endl;
@@ -230,6 +233,7 @@ void manageFarm() {
                                         cout << "take me" << endl;
                                         //cheehui harvest bot;
                                         //HarvestingBot();
+                                        //set plotTime to 0
                                     }
                                     else{
                                         cout << "No crop to harvest." << endl;
@@ -252,7 +256,7 @@ void manageFarm() {
                                 case 5: //time skip (x day increments)
                                     cout << "zzzzz" << endl;
                                     //time++;
-                                    
+                                    //call time skip function
                                     break;
                                 case 6: //watering plants
                                     cout << "feeeeeeeeed" << endl;
@@ -263,6 +267,10 @@ void manageFarm() {
                                     else{
                                         cout << "No crop to water." << endl;
                                     }
+                                    break;
+                                case 7: //return to main menu
+                                    cout << "Returning to main menu..." << endl;
+                                    //maincon.cpp
                                     break;
                                 default:
                                     break;
@@ -294,16 +302,16 @@ int cropstatus (int i, int r, int c) { //need to add time parameter
     }
     else {  
         warning = 0; //reset warning if water level is good
-    }
+    } 
 
     //logic for plot statuses
     if (warning == 2) { //if warning reaches 2, crop dies
         return DEAD;
     }
-    else if (plottime < availableCrops[i].getTimeToGrow()) { //if time is less than time to grow, crop is a seedling
+    else if (farm[r][c].PlotTime < availableCrops[i].getTimeToGrow()) { //if time is less than time to grow, crop is a seedling
         return SEED;
     }
-    else if (plottime >= availableCrops[i].getTimeToGrow()) { //if time is greater than or equal to time to grow, crop is harvestable
+    else if (farm[r][c].PlotTime >= availableCrops[i].getTimeToGrow()) { //if time is greater than or equal to time to grow, crop is harvestable
         return PLANT;
     }
     else cout << "No crop." << endl;  
