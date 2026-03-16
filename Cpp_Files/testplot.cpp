@@ -4,58 +4,24 @@
 #include <string>
 #include <sstream>
 #include <cstdlib>
-//#include "Robots.h"
-//#include "TimeControl.h"
+#include "Header_Files/Robots.h" //chee hui's bot functions
+//#include "Header_Files/TimeControl.h"
 #include "Header_Files/WaterSystemControl.h" //dino water
-#include "Header_Files/CropsV2.h"
+#include "Header_Files/CropsV2.h" //luis' crop data
 //#include "Header_Files/Actuators.h"
 #include "Header_Files/plotv2.h"
+//#include "Header_Files/time.h" //time variables
 
 using namespace std;
 
 //global variables:
 int farmchoice = 0;
 WaterSystemControl wsc;
+//SeedingBot sbot; do i need a global variable to make the bots work?
 
-/*
-// Stores the requirements for each crop from crops.csv
-struct CropData {
-    string name;
-    int minHum, maxHum;
-    int minTemp, maxTemp;
-    int minUV, maxUV;
-    double waterReq;
-    int timeToGrow;
-};
-
-
-vector<CropData> loadCrops() {
-    vector<CropData> crops;
-    ifstream file("Crop_Info.csv");
-    string line;
-
-    // Skip the header row
-    getline(file, line);
-
-    while (getline(file, line)) {
-        stringstream ss(line);
-        CropData c;
-        string temp;
-
-        getline(ss, c.name, ',');
-        getline(ss, temp, ','); c.minHum = stoi(temp);
-        getline(ss, temp, ','); c.maxHum = stoi(temp);
-        getline(ss, temp, ','); c.minTemp = stoi(temp);
-        getline(ss, temp, ','); c.maxTemp = stoi(temp);
-        getline(ss, temp, ','); c.minUV = stoi(temp);
-        getline(ss, temp, ','); c.maxUV = stoi(temp);
-        getline(ss, temp, ','); c.waterReq = stod(temp);
-        getline(ss, temp, ','); c.timeToGrow = stoi(temp);
-
-        crops.push_back(c);
-    }
-    return crops;
-}*/
+//global vector initialization:
+vector<CropData> availableCrops = CropData::loadCrops();
+vector<vector<Plot>> farm(3, vector<Plot>(3));
 
 void displayFarm(const vector<vector<Plot>>& farm) {
     cout << "\n--- VERTICAL FARM 3x3 SECTOR GRID ---" << endl;
@@ -80,13 +46,8 @@ void displayFarm(const vector<vector<Plot>>& farm) {
 }
 
 void manageFarm() {
-    
-    vector<CropData> availableCrops = CropData::loadCrops();
-    // Create 3x3 grid of Plots
-    vector<vector<Plot>> farm(3, vector<Plot>(3));
 
     int choice = 0;
-    int a, b = 0; //for error handling, not working
 
     while (choice != 8) {
         displayFarm(farm);
@@ -195,7 +156,6 @@ void manageFarm() {
                 }
                 
                 else {
-                    a++;
                     // Convert valid Plot ID to indices
                     int r = (plotId - 1) / 3;
                     int c = (plotId - 1) % 3;
@@ -213,12 +173,16 @@ void manageFarm() {
                         cout << endl;
                     }
 
-                    // Display the metadata
+                    // Display the metadata -- override w chee hui's
                     cout << "-------------------------------" << endl;
+                    /*
                     cout << "Crop Name:   " << farm[r][c].cropName << endl;
                     cout << "Temperature: " << farm[r][c].currentTemp << "°C" << endl;
                     cout << "Humidity:    " << farm[r][c].currentHum << "%" << endl;
                     cout << "Water Level: " << farm[r][c].currentWater << endl;
+                    cout << "Time Planted: " <<  << " days" << endl;
+                    */
+
                     //add day, global day variable
                     cout << "-------------------------------" << endl;
 
@@ -250,39 +214,63 @@ void manageFarm() {
                             switch (farmchoice)
                             {
                                 case 1: //call planting robot
-                                    cout << "Planting new crop" << endl;
+                                    cout << "planting new crop" << endl;
                                     //plantrobot();
                                     //manageFarm();
+                                    if (farm[r][c].cropName == "Empty"){ //if (farm[r][c].cropName != "Empty") - replace current statement w this once seeding bot is working:
+                                        cout << "we need da plant" << endl;
+                                        //cheehui seeding bot
+                                        //SeedingBot();
+                                        //initialize time object, and run the plotTime ++ function
+                                    }
+                                    else{
+                                        cout << "Plot already has a crop." << endl;
+                                    }
                                     break;
                                 case 2: //call harvesting robot 
                                     cout << "harvest da crop" << endl;
-                                    //harvestbot();
-                                   // manageFarm();
+                                   if (farm[r][c].cropName != "Empty"){ 
+                                        cout << "take me" << endl;
+                                        //cheehui harvest bot;
+                                        //HarvestingBot();
+                                        //set plotTime to 0
+                                    }
+                                    else{
+                                        cout << "No crop to harvest." << endl;
+                                    }
                                     break;
                                 case 3: //call pesticide robot
                                     cout << "deleting pests" << endl;
-                                    //pestbot();
-                                    //manageFarm();
+                                    if (farm[r][c].cropName != "Empty"){ 
+                                        cout << "clean me" << endl;
+                                        //cheehui pest bot;
+                                        //PesticideBot();
+                                    }
+                                    else{
+                                        cout << "No crop to apply pesticide." << endl;
+                                    }     
                                     break;
                                 case 4: //viewing other plots
-                                    cout << "viewing plots" << endl;    
-                                   // manageFarm();
+                                    cout << "viewing plots" << endl;                                      
                                     break;
-                                case 5: //time skip (1 day increments)
+                                case 5: //time skip (x day increments)
                                     cout << "zzzzz" << endl;
                                     //time++;
-                                    //manageFarm();
+                                    //call time skip function
                                     break;
                                 case 6: //watering plants
                                     cout << "feeeeeeeeed" << endl;
-                                    if (farm[r][c].cropName != " "){ //if (farm[r][c].cropName != "Empty") - replace current statement w this once seeding bot is working:
+                                    if (farm[r][c].cropName != "Empty"){ //if (farm[r][c].cropName != "Empty") - replace current statement w this once seeding bot is working:
                                         cout << "feed me" << endl;
                                         wsc.adjustWater(farm[r][c].currentWater); //dinowater
-                                        //manageFarm();
                                     }
                                     else{
                                         cout << "No crop to water." << endl;
                                     }
+                                    break;
+                                case 7: //return to main menu
+                                    cout << "Returning to main menu..." << endl;
+                                    //maincon.cpp
                                     break;
                                 default:
                                     break;
@@ -302,35 +290,35 @@ void manageFarm() {
     }
 }
   
-//put this in plots.h
-/*
-int cropstatus(cropstatus){ //eventually transition to enum for easier reading
-    int warning == 0;
+enum Status { SEED, PLANT, DEAD };
 
-    if (timeToGrow > time status){ //seedling status
-        cropstatus = "seed"        
+int cropstatus (int i, int r, int c) { //need to add time parameter 
+    int warning = 0; 
+    
+    availableCrops[i].getWaterReq(); //get water requirement for specific crop
+    if (farm[r][c].currentWater <= (availableCrops[i].getWaterReq() + 5) || (farm[r][c].currentWater > (availableCrops[i].getWaterReq() - 5))) { //if current water level is not within 5 units of water requirement, crop is dying
+        warning++;
+        cout << "Your crop is dying." << endl;
     }
-    else if (timeToGrow <= time status) { //harvestable crop status
-        cropstatus = "plant" 
+    else {  
+        warning = 0; //reset warning if water level is good
+    } 
+
+    //logic for plot statuses
+    if (warning == 2) { //if warning reaches 2, crop dies
+        return DEAD;
     }
-    //condition: drowning/not enough water - after 2 days crop  d i e s
-    else if (currentWaterlvl >= waterReq || currentWaterlvl < waterReq ) { //dead, need import from actuator
-        warning ++;
-        cout << "Your crop is dying." << endl;;
-            if (warning >= 2){
-                cropstatus = "dead";
-                warning == 0;
-            }
+    else if (farm[r][c].PlotTime < availableCrops[i].getTimeToGrow()) { //if time is less than time to grow, crop is a seedling
+        return SEED;
     }
-    else { //no status 
-        cropstatus = "no plants in plot"
+    else if (farm[r][c].PlotTime >= availableCrops[i].getTimeToGrow()) { //if time is greater than or equal to time to grow, crop is harvestable
+        return PLANT;
     }
-return cropstatus;
+    else cout << "No crop." << endl;  
 }
-*/
+
 //change function name
 int main() {
     manageFarm();
-
     return 0;
 }
