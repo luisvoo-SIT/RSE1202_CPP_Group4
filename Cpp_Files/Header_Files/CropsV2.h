@@ -27,14 +27,14 @@ public:
     static vector<CropData> loadCrops(); 
     void displaycropsinfo();
 
-    string getName() const ;
-    int getTimetoGrow() const ;
-    int getwaterRequirements() const ;
-    int getminHumidity() const ;
-    int getmaxHumidity() const ;
-    int getminTemperature() const;
-    int getmaxTemperature() const ;
-    int getminUVIntensity() const;
-    int getmaxUVIntensity() const ;
+    string getName() const;
+    int getMinHum() const;
+    int getMaxHum() const;
+    int getMinTemp() const;
+    int getMaxTemp() const;
+    int getMinUV() const;
+    int getMaxUV() const;
+    double getWaterReq() const;
+    int getTimeToGrow() const;
     };
     
