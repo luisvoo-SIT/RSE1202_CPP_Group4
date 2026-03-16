@@ -60,7 +60,7 @@ vector<CropData> CropData::loadCrops() {
     //and then create a vector of that struct or class to store all the crops loaded from the file
 
 
-void Crop::displaycropsinfo() {
+void CropData::displaycropsinfo() {
     cout << "Name: " << name << "\n"
          << "  Humidity range: " << minHumidity << " - " << maxHumidity << "\n"
          << "  Temperature range: " << minTemperature << " - " << maxTemperature << "\n"
