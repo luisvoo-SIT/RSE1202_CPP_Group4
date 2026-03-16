@@ -9,72 +9,57 @@
 using namespace std;
 
 
-Crop::Crop(string n, int minH, int maxH, int minT, int maxT,
-           int minUV, int maxUV, int water, int time) {
-    name = n;
-    minHumidity = minH;
-    maxHumidity = maxH;
-    minTemperature = minT;
-    maxTemperature = maxT;
-    minUVIntensity = minUV;
-    maxUVIntensity = maxUV;
-    waterRequirement = water;
+CropData::CropData(string n, int minH, int maxH, int minT, int maxT,
+           int minUV, int maxUV, double water, int time) {
+    name      = n;
+    minHum    = minH;
+    maxHum    = maxH;
+    minTemp   = minT;
+    maxTemp   = maxT;
+    minUV     = minUV;
+    maxUV     = maxUV;
+    waterReq  = water;
     timeToGrow = time;
 }
 
-vector<Crop> Crop::loadCrops(const string &filename) {
-    vector<Crop> crops;
-    string line; // 
-    size_t location; // for parsing CSV
-    stringstream ss(line);
-    string token;
-    vector<string> fields;
-    
+vector<CropData> CropData::loadCrops() {
+    vector<CropData> crops;
+    ifstream file("Crop_Info.csv");
+    string line;
 
-    //cout<<"Type your filename"<<endl;
-    //cin>>filename;
-    cout << "Loading crops from file: " << filename << endl;
-    ifstream file(filename);
+    // Skip the header row
     getline(file, line);
-    cout << "Header: " << line << endl; // Print the header for verification
 
- while (getline(file, line)) {
-    if (line.empty()) continue;
+    while (getline(file, line)) {
+        stringstream ss(line);
+        string temp;
+        string name;
+        int minH, maxH, minT, maxT, minUV, maxUV, time;
+        double water;
 
-    stringstream ss(line);
-    string token;
-    vector<string> fields;
-    while (getline(ss, token, ',')) {
-        fields.push_back(token);
+        getline(ss, name,  ',');
+        getline(ss, temp,  ','); minH  = stoi(temp);
+        getline(ss, temp,  ','); maxH  = stoi(temp);
+        getline(ss, temp,  ','); minT  = stoi(temp);
+        getline(ss, temp,  ','); maxT  = stoi(temp);
+        getline(ss, temp,  ','); minUV = stoi(temp);
+        getline(ss, temp,  ','); maxUV = stoi(temp);
+        getline(ss, temp,  ','); water = stod(temp);
+        getline(ss, temp,  ','); time  = stoi(temp);
+
+        crops.push_back(CropData(name, minH, maxH, minT, maxT,
+                                  minUV, maxUV, water, time));
+
+        cout << "Loaded crop: " << name << "\n";
     }
-
-    if (fields.size() < 9) continue;
-
-    string localName;
-    int minH, maxH, minT, maxT, minUV, maxUV, water, timeToGrow;
-
-    localName  = fields[0];                                                 // convert numeric fields using stoi to prevent type errors
-    minH       = stoi(fields[1]);
-    maxH       = stoi(fields[2]);
-    minT       = stoi(fields[3]);
-    maxT       = stoi(fields[4]);
-    minUV      = stoi(fields[5]);
-    maxUV      = stoi(fields[6]);
-    water      = stoi(fields[7]);
-    timeToGrow = stoi(fields[8]);
-
-    crops.push_back(Crop(localName, minH, maxH, minT, maxT, minUV, maxUV, water, timeToGrow));
-    cout << "All crops loaded" << endl; 
-
-}
-return crops;
+    return crops;
 }
 
     //I need to add a loop to read each line of the file and create Crop objects accordingly, and then store them in a vector for later use
     //but vector can only store one type of data, so I need to create a struct or class to hold the crop data,
     //and then create a vector of that struct or class to store all the crops loaded from the file
 
-
+/*
 void Crop::displaycropsinfo() {
     cout << "Name: " << name << "\n"
          << "  Humidity range: " << minHumidity << " - " << maxHumidity << "\n"
@@ -126,4 +111,4 @@ void testUserInput() {
     cout << "Test completed successfully!\n";
 
 }
-
+*/
