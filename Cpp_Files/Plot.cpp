@@ -82,7 +82,7 @@ void displayFarm(const vector<vector<Plot>>& farm) {
 }
 
 void manageFarm() {
-    vector<Crop> availableCrops = Crop::loadCrops("Crop_Info.csv");
+    vector<CropData> availableCrops = CropData::loadCrops(;
     // Create 3x3 grid of Plots
     vector<vector<Plot>> farm(3, vector<Plot>(3));
 

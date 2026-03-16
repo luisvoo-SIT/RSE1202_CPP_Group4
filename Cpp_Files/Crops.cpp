@@ -70,34 +70,15 @@ void Crop::displaycropsinfo() {
          << "-------------------------------";
 }    
 
-string Crop::getName() const{
-    return name;
-}
-int Crop::getTimetoGrow() const{
-    return timeToGrow;
-}
-int Crop::getwaterRequirements() const{
-    return waterRequirement;
-}
-int Crop::getminHumidity() const{
-    return minHumidity;
-}
-int Crop::getmaxHumidity() const{
-    return maxHumidity;
-    }
-int Crop::getminTemperature() const{
-    return minTemperature;
-}
-int Crop::getmaxTemperature() const {
-        return maxTemperature;
-    }
-int Crop::getminUVIntensity() const{
-    return minUVIntensity;
-    }
-int Crop::getmaxUVIntensity() const{
-    return maxUVIntensity;
-    }
-
+string CropData::getName() const { return name; }
+int CropData::getMinHum() const { return minHum; }
+int CropData::getMaxHum() const { return maxHum; }
+int CropData::getMinTemp() const { return minTemp; }
+int CropData::getMaxTemp() const { return maxTemp; }
+int CropData::getMinUV() const { return minUV; }
+int CropData::getMaxUV() const { return maxUV; }
+double CropData::getWaterReq() const { return waterReq; }
+int CropData::getTimeToGrow() const { return timeToGrow; }
 
     // Implementation for loading crops from file
 
@@ -112,3 +93,8 @@ void testUserInput() {
 
 }
 */
+
+int main(){
+    vector<CropData> availableCrops = CropData::loadCrops();
+    cout<<CropData::getName();
+}
