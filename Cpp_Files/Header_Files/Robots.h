@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 #include <string>
 
 using namespace std;
@@ -14,11 +15,6 @@ public:
 
     void statusReport() const;
 
-    bool          getIsOperational() const { return isOperational; }
-    double        getBatteryLevel()  const { return batteryLevel;  }
-    const string& getName()          const { return name;          }
-
-
-
-
+    const string& getRobName() const { return name; }
+    const string& getId()   const { return id;   }
 };

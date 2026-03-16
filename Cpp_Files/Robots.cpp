@@ -2,6 +2,7 @@
 #include "Header_Files/seedingBot.h"
 #include "Header_Files/SprayerBot.h"
 #include "Header_Files/HarvestBot.h"
+#include "Header_Files/CropsV2.h"
 #include <iostream>
 
 using namespace std;
@@ -14,42 +15,42 @@ Robot::Robot(const string& id, const string& name)
     : id(id), name(name) {}
 
 void Robot::statusReport() const {
-    cout << "=== " << name << " [" << id << "] ===\n";
+   std::cout << "=== " << name << " [" << id << "] ===\n";
 }
 
 // ══════════════════════════════════════════════════════════════
 //  SEEDING BOT
 // ══════════════════════════════════════════════════════════════
 
-SeedingBot::SeedingBot(const string& id, const Crop& crop)
+SeedingBot::SeedingBot(const string& id, const CropData& crop)
     : Robot(id, "SeedingBot-" + id),
       assignedCrop(crop),
       seedsPlanted(0) {}
 
-string SeedingBot::plantSeeds(int count, const vector<Crop>& crops) {
+string SeedingBot::plantSeeds(int count, const vector<CropData>& crops) {
     if (crops.empty()) {
-        cout << "No crops available.\n";
+        std::cout << "No crops available.\n";
         return "";
     }
 
     // ── User selects seed type ────────────────────────────────
-    cout << "\n=== Available Seed Types ===\n";
+    std::cout << "\n=== Available Seed Types ===\n";
     for (size_t i = 0; i < crops.size(); ++i)
-        cout << i + 1 << ". " << crops[i].getName() << "\n";
+        std::cout << i + 1 << ". " << crops[i].getName() << "\n";
 
     int choice;
-    cout << "\nSelect a seed type: ";
+    std::cout << "\nSelect a seed type: ";
     cin  >> choice;
 
     if (choice < 1 || choice > (int)crops.size()) {
-        cout << "Invalid choice.\n";
+        std::cout << "Invalid choice.\n";
         return "";
     }
 
     assignedCrop  = crops[choice - 1];
     seedsPlanted += count;
 
-    cout << name << ": Planting " << count
+    std::cout << name << ": Planting " << count
          << " " << assignedCrop.getName()                              << " seeds\n"
          << "  Time to Grow : " << assignedCrop.getTimetoGrow()        << " days\n"
          << "  Water/day    : " << assignedCrop.getwaterRequirements() << " mL\n"
@@ -60,7 +61,7 @@ string SeedingBot::plantSeeds(int count, const vector<Crop>& crops) {
 
 void SeedingBot::statusReport() const {
     Robot::statusReport();
-    cout << "  Crop         : " << assignedCrop.getName()               << "\n"
+    std::cout << "  Crop         : " << assignedCrop.getName()               << "\n"
          << "  Time to Grow : " << assignedCrop.getTimetoGrow()         << " days\n"
          << "  Humidity     : " << assignedCrop.getminHumidity()
                                 << " - " << assignedCrop.getmaxHumidity()    << " %\n"
@@ -102,7 +103,7 @@ bool SprayerBot::sprayArea(double areaSqM) {
     double required = areaSqM * sprayRateL_per_m2;
 
     if (tankLevelL < required) {
-        cout << name << ": Not enough chemical. Need "
+        std::cout << name << ": Not enough chemical. Need "
              << required << " L, have " << tankLevelL << " L\n";
         return false;
     }
@@ -110,7 +111,7 @@ bool SprayerBot::sprayArea(double areaSqM) {
     tankLevelL -= required;
     ++spraySessionsDone;
 
-    cout << name << ": Spraying " << areaSqM << " m² with "
+    std::cout << name << ": Spraying " << areaSqM << " m² with "
          << chemicalName          << " (" << modeToString(mode) << ")\n"
          << "  Used     : "       << required   << " L\n"
          << "  Remaining: "       << tankLevelL << " L\n";
@@ -120,12 +121,12 @@ bool SprayerBot::sprayArea(double areaSqM) {
 
 void SprayerBot::refillTank() {
     tankLevelL = tankCapacityL;
-    cout << name << ": Tank refilled to " << tankCapacityL << " L\n";
+    std::cout << name << ": Tank refilled to " << tankCapacityL << " L\n";
 }
 
 void SprayerBot::statusReport() const {
     Robot::statusReport();
-    cout << "  Mode         : " << modeToString(mode) << "\n"
+    std::cout << "  Mode         : " << modeToString(mode) << "\n"
          << "  Chemical     : " << chemicalName        << "\n"
          << "  Tank         : " << tankLevelL
                                 << " / " << tankCapacityL << " L\n"
@@ -136,7 +137,6 @@ void SprayerBot::statusReport() const {
 // ══════════════════════════════════════════════════════════════
 //  HARVESTING BOT
 // ══════════════════════════════════════════════════════════════
-
 string HarvestingBot::statusToString(PlantStatus status) {
     switch (status) {
         case PlantStatus::SEED:  return "Seed";
@@ -201,9 +201,27 @@ void HarvestingBot::statusReport() const {
 
     if (!log.empty()) {
         cout << "  Harvest Log:\n";
-        for (const auto& r : log)
-            cout << "    " << r.cropType << " | ripeness " << r.ripenessScore
-                 << " | " << r.yieldKg << " kg\n";
+
+        cout << "    [Plant Harvests]\n";
+        bool anyPlant = false;
+        for (const auto& r : log) {
+            if (r.status == PlantStatus::PLANT) {
+                cout << "      " << r.cropType
+                     << " | "   << r.yieldKg << " kg\n";
+                anyPlant = true;
+            }
+        }
+        if (!anyPlant) cout << "      (none)\n";
+
+        cout << "    [Dead Harvests]\n";
+        bool anyDead = false;
+        for (const auto& r : log) {
+            if (r.status == PlantStatus::DEAD) {
+                cout << "      " << r.cropType
+                     << " | "   << r.yieldKg << " kg\n";
+                anyDead = true;
+            }
+        }
+        if (!anyDead) cout << "      (none)\n";
     }
 }
-
