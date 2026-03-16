@@ -59,7 +59,7 @@ vector<CropData> CropData::loadCrops() {
     //but vector can only store one type of data, so I need to create a struct or class to hold the crop data,
     //and then create a vector of that struct or class to store all the crops loaded from the file
 
-/*
+
 void Crop::displaycropsinfo() {
     cout << "Name: " << name << "\n"
          << "  Humidity range: " << minHumidity << " - " << maxHumidity << "\n"
@@ -101,7 +101,7 @@ int Crop::getmaxUVIntensity() const{
 
     // Implementation for loading crops from file
 
-
+/*
 // Test function to verify user input loading works
 void testUserInput() {
     string filename;
