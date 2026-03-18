@@ -45,9 +45,24 @@ CropData SeedingBot::plantSeeds(int count, const vector<CropData>& crops) {
     std::cout << "\nSelect a seed type: ";
     cin  >> choice;
 
-    if (choice < 1 || choice > (int)crops.size()) {
-        std::cout << "Invalid choice.\n";
-        return assignedCrop;
+   while (true) {
+        std::cout << "\nSelect a seed type: ";
+
+        if (!(cin >> choice)) {
+            // ── user entered non-integer ──────────────────────
+            std::cout << "Error: please enter a number.\n";
+            cin.clear();                // ← clear error flag
+            cin.ignore(1000, '\n');     // ← discard bad input
+            continue;
+        }
+
+        if (choice < 1 || choice > (int)crops.size()) {
+            std::cout << "Error: invalid choice. Please enter between 1 and "
+                      << crops.size() << ".\n";
+            continue;
+        }
+
+        break;      // ← valid input, exit loop
     }
     
     assignedCrop  = crops[choice - 1];
@@ -136,11 +151,26 @@ std::string SprayerBot::sprayArea(double areaSqM) {
     std::cout << "\n=== Select Spray Mode ===\n"
               << "1. Fertilizer\n"
               << "2. Pesticide\n"
-              << "3. Herbicide\n"
-              << "Select mode: ";
+              << "3. Herbicide\n";
 
     int modeChoice;
-    std::cin >> modeChoice;
+    while (true) {
+        std::cout << "Select mode: ";
+
+        if (!(std::cin >> modeChoice)) {
+            std::cout << "Error: please enter a number.\n";
+            std::cin.clear();
+            std::cin.ignore(1000, '\n');
+            continue;
+        }
+
+        if (modeChoice < 1 || modeChoice > 3) {
+            std::cout << "Error: invalid choice. Please enter 1, 2 or 3.\n";
+            continue;
+        }
+
+        break;      // ← valid input
+    }
 
     // ── Step 2: Set chemical name based on mode ───────────────
     switch (modeChoice) {
