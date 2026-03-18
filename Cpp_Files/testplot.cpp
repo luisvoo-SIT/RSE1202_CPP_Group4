@@ -189,7 +189,8 @@ void manageFarm() {
                                    if (farm[r][c].cropName != "Empty"){ 
                                         cout << "take me" << endl;
                                         //cheehui harvest bot;
-
+                                        Plot::Status status = static_cast<Plot::Status>(farm[r][c].cropstatus);
+                                        harvester.evaluateAndHarvest(availableCrops[0], status); //placeholder crop data and plot status
                                         
                                         farm[r][c].cropstatus = Plot::Status::EMPTY; //plot status now empty
                                         //reset plot to default values
