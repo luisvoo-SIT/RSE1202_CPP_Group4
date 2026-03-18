@@ -253,15 +253,27 @@ HarvestingBot::HarvestingBot(const std::string& id)
       totalPlantKg(0.0),
       harvests(0) {}
 
-bool HarvestingBot::evaluateAndHarvest(const CropData   farm[3][3],
-                                       int              r,
-                                       int              c,
+std::string HarvestingBot::statusToString(Plot::Status status) {
+    switch (status) {
+        case Plot::Status::SEED:  return "Seed";
+        case Plot::Status::PLANT: return "Plant";
+        case Plot::Status::DEAD:  return "Dead";
+    }
+    return "Unknown";
+}
+
+HarvestingBot::HarvestingBot(const std::string& id)
+    : Robot(id, "HarvestingBot-" + id),
+      totalHarvestedKg(0.0),
+      totalDeadKg(0.0),
+      totalPlantKg(0.0),
+      harvests(0) {}
+
+bool HarvestingBot::evaluateAndHarvest(const CropData&  cropData,
                                        Plot::Status status) {
-    // ── Step 1: Get CropData from farm array ──────────────────
-    CropData    cropData = farm[r][c];
     std::string cropName = cropData.getName();
 
-    // ── Step 2: Generate random yield between 80-100% of 1kg ──
+    // ── Generate random yield between 80-100% of 1kg ──────────
     std::random_device             rd;
     std::mt19937                   gen(rd());
     std::uniform_real_distribution dist(0.80, 1.00);
@@ -270,17 +282,15 @@ bool HarvestingBot::evaluateAndHarvest(const CropData   farm[3][3],
     double percentage    = dist(gen);
     double expectedYield = maxYieldKg * percentage;
 
-    std::cout << name << ": Scanning plot ["
-              << r << "][" << c << "]\n"
-              << "  Crop          : " << cropName                  << "\n"
-              << "  Plot Status   : " << statusToString(status)    << "\n"
-              << "  Time to Grow  : " << cropData.getTimeToGrow()       << " days\n"
-              << "  Water/day     : " << cropData.getWaterReq() << " mL\n"
-              << "  Max Yield     : " << maxYieldKg                << " kg\n"
-              << "  Yield %       : " << percentage * 100          << "%\n"
-              << "  Expected Yield: " << expectedYield             << " kg\n";
+    std::cout << name << ": Harvesting " << cropName << "\n"
+              << "  Status        : " << statusToString(status)  << "\n"
+              << "  Time to Grow  : " << cropData.getTimeToGrow() << " days\n"
+              << "  Water/day     : " << cropData.getWaterReq()   << " mL\n"
+              << "  Max Yield     : " << maxYieldKg               << " kg\n"
+              << "  Yield %       : " << percentage * 100         << "%\n"
+              << "  Expected Yield: " << expectedYield            << " kg\n";
 
-    // ── Step 3: Calculate yield based on status ───────────────
+    // ── Calculate yield based on status ───────────────────────
     switch (status) {
         case Plot::Status::SEED:
             std::cout << "  Seed detected – too early. Skipping.\n";
