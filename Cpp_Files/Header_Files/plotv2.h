@@ -14,6 +14,7 @@ class Plot {
         float currentHum = 60.0;
         float currentWater = 50.0;
         string cropName = "Empty";
+        enum Status { SEED, PLANT, DEAD };
         char symbol = ' ';
         int PlotTime = 0; //how long the crop has been planted for - will be cleared for timecontrol.cpp
 

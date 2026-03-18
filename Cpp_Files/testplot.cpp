@@ -17,6 +17,7 @@ using namespace std;
 //global variables:
 int farmchoice = 0;
 WaterSystemControl wsc;
+Plot::Status cropstatus;
 //SeedingBot sbot; do i need a global variable to make the bots work?
 
 //global vector initialization:
@@ -289,8 +290,7 @@ void manageFarm() {
         }
     }
 }
-  
-enum Status { SEED, PLANT, DEAD };
+
 
 int cropstatus (int i, int r, int c) { //need to add time parameter 
     int warning = 0; 
@@ -306,13 +306,13 @@ int cropstatus (int i, int r, int c) { //need to add time parameter
 
     //logic for plot statuses
     if (warning == 2) { //if warning reaches 2, crop dies
-        return DEAD;
+        return 0;
     }
     else if (farm[r][c].PlotTime < availableCrops[i].getTimeToGrow()) { //if time is less than time to grow, crop is a seedling
-        return SEED;
+        return 1;
     }
     else if (farm[r][c].PlotTime >= availableCrops[i].getTimeToGrow()) { //if time is greater than or equal to time to grow, crop is harvestable
-        return PLANT;
+        return 2;
     }
     else cout << "No crop." << endl;  
 }
