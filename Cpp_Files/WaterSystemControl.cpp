@@ -1,4 +1,6 @@
 #include "Header_Files/WaterSystemControl.h"
+#include <limits>
+
 
 void WaterSystemControl::adjustWater(unsigned int &currentWater) 
 {
@@ -56,18 +58,24 @@ void WaterSystemControl::adjustWater(unsigned int &currentWater)
         // if not successful, prompt user "Invalid input..."
         if (!(iss >> parsedValue)) {
             std::cout << "Invalid input. Please enter a numeric value: ";
+            cin.clear();     // clear error flags
+            cin.ignore(numeric_limits<streamsize>::max(),'\n'); // clear input buffer
             continue;   // skip to the start of the while loop
         }
 
         // if have leftover non-numeric characters after the number
         if (iss >> leftover) {
             std::cout << "Invalid input. Unexpected characters after the number: ";
+            cin.clear();     // clear error flags
+            cin.ignore(numeric_limits<streamsize>::max(),'\n'); // clear input buffer
             continue;   // skip to the start of the while loop
         }
 
         // if parsedValue outside range of (0-10)
         if (parsedValue < 0 || parsedValue > 10) {
             std::cout << "Invalid input. Value must be between 0 and 10: ";
+            cin.clear();     // clear error flags
+            cin.ignore(numeric_limits<streamsize>::max(),'\n'); // clear input buffer
             continue;   // skip to the start of the while loop
         }
 
@@ -82,7 +90,7 @@ void WaterSystemControl::adjustWater(unsigned int &currentWater)
 
     // Prints updated water level to console
     cout << ">>> Water level has been updated to: " << currentWater << " litres" << endl;
-
+    
 
 
 
