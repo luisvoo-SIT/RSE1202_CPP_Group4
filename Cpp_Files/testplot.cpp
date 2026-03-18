@@ -35,7 +35,7 @@ WaterSystemControl wsc;
 Plot::Status cropstatus (int i, int r, int c);
 string seedbotname = "S01";
  // Initialize with default crop, will be updated when user plants
-//HarvestingBot harvester ("H01"); //harvest bot initialization
+HarvestingBot harvester ("H01"); //harvest bot initialization
 // SprayerBot sprayer ("P01"); //sprayer bot initialization
 TimeControl advancePlotTime; //time control initialization (plot only)
 
@@ -43,6 +43,7 @@ TimeControl advancePlotTime; //time control initialization (plot only)
 vector<CropData> availableCrops = CropData::loadCrops();
 vector<vector<Plot>> farm(3, vector<Plot>(3));
 SeedingBot seeder (seedbotname, availableCrops[0]);
+
 
 void displayFarm(const vector<vector<Plot>>& farm) {
     cout << "\n--- VERTICAL FARM 3x3 SECTOR GRID ---" << endl;
@@ -74,84 +75,6 @@ void manageFarm() {
         displayFarm(farm);
         cout << "\n1. View Plot\n2. Return to Main Menu\n   Choice: ";
         cin >> choice;
-
-        /*if (choice == 1) {
-            int r, c;
-            cout << "Enter Plot Row (1-3): ";
-            cin >> r;
-            cout << "Enter Plot Column (1-3): ";
-            cin >> c;
-
-            // Validate input
-            if (r < 1 || r > 3 || c < 1 || c > 3) {
-                cout << "Invalid plot coordinates. Please enter values between 1 and 3." << endl;
-                continue;
-            }
-
-            // Adjust for 0-based indexing
-            r--; c--;
-
-            cout << "\n--- PLOT DETAILS ---" << endl;
-            cout << "Crop: " << farm[r][c].cropName << endl;
-            cout << "Temperature: " << farm[r][c].currentTemp << "°C" << endl;
-            cout << "Humidity: " << farm[r][c].currentHum << "%" << endl;
-        } 
-
-        else if (choice == 2) {
-            int r, c, cropIdx, plotId;
-
-            // Use a while loop to force valid input
-            cout << "Select Plot ID (1-9): ";
-            cin >> plotId;
-
-            while (plotId < 1 || plotId > 9) {
-                // Clear the error flag and ignore bad input in case they typed a letter
-                if (cin.fail()) {
-                    cin.clear();
-                    cin.ignore(1000, '\n');
-                }
-                
-                cout << "Invalid plot ID. "<< endl << "Please enter a number between 1 and 9: ";
-                cin >> plotId;
-            }
-
-            // Convert plot ID to row and column indices
-            r = (plotId - 1) / 3;
-            c = (plotId - 1) % 3;
-
-            cout << "Available Crops:\n";
-            for (int i = 0; i < availableCrops.size(); i++) {
-                cout << i + 1 << ". " << availableCrops[i].name << endl;
-            }
-            cout << "Select Crop Index: ";
-            cin >> cropIdx;
-
-            farm[r][c].cropName = availableCrops[cropIdx - 1].name;
-            farm[r][c].symbol = availableCrops[cropIdx - 1].name[0]; // Use first letter
-
-            cout << "Planted " << farm[r][c].cropName << " in Sector [" << r << "][" << c << "]" << endl;
-
-            
-        }
-
-        else if (choice == 3) {
-            //Water Crop
-            cout << "Watering Crops..." << endl;
-            cout << "Enter Robot Function..." << endl;
-
-        }
-
-        else if (choice == 4) {
-            //Harvest Crop
-            cout << "Harvesting Crops..." << endl;
-            cout << "Enter Robot Function..." << endl;
-        }
-
-        else if (choice == 5) {
-            //Time Skip
-            cout << "Skipping time..." << endl;
-            cout << "Enter Time Skip Function..." << endl;
-        }*/
 
         if (choice == 1) {
             int plotId;
@@ -241,8 +164,6 @@ void manageFarm() {
                                     //manageFarm();
                                     if (farm[r][c].cropName == "Empty"){ //if (farm[r][c].cropName != "Empty") - replace current statement w this once seeding bot is working:
                                         cout << "we need da plant" << endl;
-                                        //cheehui seeding bot
-                                        //SeedingBot();
                                         CropData plant = seeder.plantSeeds(1, availableCrops);  //to store the returned object into the array
                                         farm[r][c].cropName = plant.getName();
                                         // ── Access all crop data through the returned object ──────────
@@ -268,8 +189,9 @@ void manageFarm() {
                                    if (farm[r][c].cropName != "Empty"){ 
                                         cout << "take me" << endl;
                                         //cheehui harvest bot;
-                                        //HarvestingBot();
-                                        //set plotTime to 0
+                                        harvester.evaluateAndHarvest(farm, r, c, farm[r][c].cropstatus);
+                                        farm[r][c].cropstatus = Plot::Status::EMPTY; //plot status now empty
+                                        //set plotTime and plot water level to 0
                                         farm[r][c].PlotTime = 0;
                                         farm[r][c].currentWater = 0;
                                     }
