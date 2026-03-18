@@ -36,5 +36,6 @@ public:
     int getMaxUV() const;
     double getWaterReq() const;
     int getTimeToGrow() const;
+
     };
     

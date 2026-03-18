@@ -10,14 +10,14 @@ using namespace std;
 
 
 CropData::CropData(string n, int minH, int maxH, int minT, int maxT,
-           int minUV, int maxUV, double water, int time) {
+           int min_UV, int max_UV, double water, int time) {
     name      = n;
     minHum    = minH;
     maxHum    = maxH;
     minTemp   = minT;
     maxTemp   = maxT;
-    minUV     = minUV;
-    maxUV     = maxUV;
+    minUV     = min_UV;
+    maxUV     = max_UV;
     waterReq  = water;
     timeToGrow = time;
 }
@@ -79,6 +79,7 @@ int CropData::getMinUV() const { return minUV; }
 int CropData::getMaxUV() const { return maxUV; }
 double CropData::getWaterReq() const { return waterReq; }
 int CropData::getTimeToGrow() const { return timeToGrow; }
+
 
     // Implementation for loading crops from file
 

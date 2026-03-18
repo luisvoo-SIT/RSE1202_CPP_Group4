@@ -1,6 +1,0 @@
-Name,minHumidity,maxHumidity,minTemperature,maxTemperature,minUVIntensity,maxUVIntensity,waterRequirement,timeToGrow
-Spinach,60,75,15,25,10,20,4,5
-Coriander,50,70,15,25,5,15,1,4
-Cabbage,60,90,15,18,10,20,1.5,13
-Lettuce,60,80,7,24,3,8,1,10
-Broccoli,60,90,15,21,10,20,1.2,12
