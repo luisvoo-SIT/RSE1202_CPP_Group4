@@ -42,10 +42,8 @@ CropData SeedingBot::plantSeeds(int count, const vector<CropData>& crops) {
         std::cout << i + 1 << ". " << crops[i].getName() << "\n";
 
     int choice;
-    std::cout << "\nSelect a seed type: ";
-    cin  >> choice;
 
-   while (true) {
+    while (true) {
         std::cout << "\nSelect a seed type: ";
 
         if (!(cin >> choice)) {
