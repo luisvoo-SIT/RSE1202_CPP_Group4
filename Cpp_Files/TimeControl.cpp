@@ -1,26 +1,21 @@
-#include "time.h"
+#include "Header_Files/time.h"
 
-time::TimeControl() {
-    PlotTime = 0;
-    GlobalTime = 0;
-}
 
-void TimeControl::advancePlotTime() {
+void TimeControl::advancePlotTime(int PlotTime) {
     PlotTime++;
 }
 
-void TimeControl::resetPlotTime() {
+void TimeControl::resetPlotTime(int PlotTime) {
     PlotTime = 0;
-    
 }
-
-void TimeControl::advanceGlobalTime() {
+/* 
+void TimeControl::advanceGlobalTime(int PlotTime) {
     GlobalTime++;
 }
 
-void TimeControl::resetGlobalTime() {
+void TimeControl::resetGlobalTime(int PlotTime) {
     GlobalTime = 0;
 }
-
+*/
 int TimeControl::getPlotTime() const { return PlotTime; }
-int TimeControl::getGlobalTime() const { return GlobalTime; }
+//int TimeControl::getGlobalTime() const { return GlobalTime; }
