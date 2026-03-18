@@ -1,6 +1,7 @@
 #pragma once
 #include "Robots.h"
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -9,12 +10,21 @@ public:
     enum class SprayMode { FERTILIZER, PESTICIDE, HERBICIDE };
 
 private:
+
+    struct SprayRecord {
+        string mode;
+        string chemicalName;
+        double areaSprayed;
+        double chemicalUsed;
+    };
+
     SprayMode   mode;
     double      tankCapacityL;
     double      tankLevelL;
     double      sprayRateL_per_m2;
     string chemicalName;
     int         spraySessionsDone;
+    vector<SprayRecord> sprayLog;
 
     static string modeToString(SprayMode m);
 
