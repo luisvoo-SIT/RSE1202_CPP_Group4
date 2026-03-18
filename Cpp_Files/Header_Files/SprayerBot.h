@@ -23,8 +23,8 @@ public:
                double             tankCapacityL,
                double             sprayRate);
 
-    bool sprayArea(double areaSqM);     // ← user prompted inside
-    void statusReport() const;
+    string sprayArea(double areaSqM);  // ← returns string
+    void        statusReport() const;
 
     SprayMode   getMode()          const { return mode;             }
     double      getTankLevel()     const { return tankLevelL;       }
