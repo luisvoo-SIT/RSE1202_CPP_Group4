@@ -12,29 +12,63 @@ void writeLogsToFile(const SeedingBot&    seeder,
 
     // ── Ask user for file name ────────────────────────────────
     string fileName;
-    cout << "\nEnter output file name (without extension): ";
+    cout << "\nEnter output file name: ";
     cin  >> fileName;
 
-    // ── Ask user for file format ──────────────────────────────
-    cout << "\n=== Select File Format ===\n"
-         << "1. Text file (.txt)\n"
-         << "2. CSV file  (.csv)\n"
-         << "Select format: ";
+    // ── Check what extension the user entered ─────────────────
+    bool hasTxt = fileName.find(".txt") != string::npos;
+    bool hasCsv = fileName.find(".csv") != string::npos;
 
-    int formatChoice;
-    cin >> formatChoice;
+    // ── Check if user entered an unsupported extension ────────
+    bool hasOtherExtension = false;
+    if (!hasTxt && !hasCsv) {
+        size_t dotPos = fileName.find_last_of(".");
+        if (dotPos != string::npos) {
+            // ── dot found but not .txt or .csv ────────────────
+            hasOtherExtension = true;
+            string enteredExt = fileName.substr(dotPos);
+            cout << "Unsupported file format: " << enteredExt << "\n"
+                 << "Supported formats are .txt and .csv only.\n";
 
-    // ── Validate choice ───────────────────────────────────────
-    while (formatChoice != 1 && formatChoice != 2) {
-        cout << "Invalid choice. Please enter 1 or 2: ";
-        cin  >> formatChoice;
+            // ── remove the unsupported extension ──────────────
+            fileName = fileName.substr(0, dotPos);
+            cout << "File name changed to: " << fileName << "\n";
+        }
     }
 
-    // ── Add extension based on choice ─────────────────────────
-    if (formatChoice == 1)
-        fileName += ".txt";
-    else
-        fileName += ".csv";
+    int formatChoice;
+
+    if (hasTxt) {
+        // ── user already typed .txt ───────────────────────────
+        cout << "Text file format detected.\n";
+        formatChoice = 1;
+
+    } else if (hasCsv) {
+        // ── user already typed .csv ───────────────────────────
+        cout << "CSV file format detected.\n";
+        formatChoice = 2;
+
+    } else {
+        // ── no valid extension — ask user to choose ───────────
+        cout << "\n=== Select File Format ===\n"
+             << "1. Text file (.txt)\n"
+             << "2. CSV file  (.csv)\n"
+             << "Select format: ";
+
+        cin >> formatChoice;
+
+        // ── validate choice ───────────────────────────────────
+        while (formatChoice != 1 && formatChoice != 2) {
+            cout << "Invalid choice. Please enter 1 or 2: ";
+            cin  >> formatChoice;
+        }
+
+        // ── add extension ─────────────────────────────────────
+        if (formatChoice == 1)
+            fileName += ".txt";
+        else
+            fileName += ".csv";
+    }
 
     // ── Open file ─────────────────────────────────────────────
     ofstream file(fileName);
@@ -50,8 +84,6 @@ void writeLogsToFile(const SeedingBot&    seeder,
         // ══════════════════════════════════════════════════════
         //  CSV FORMAT
         // ══════════════════════════════════════════════════════
-
-        // ── SeedingBot CSV ────────────────────────────────────
         file << "SEEDINGBOT LOG\n"
              << "Session,CropName,TimeToGrow,WaterPerDay,"
              << "MinHumidity,MaxHumidity,MinTemperature,"
@@ -75,7 +107,6 @@ void writeLogsToFile(const SeedingBot&    seeder,
             }
         }
 
-        // ── SprayerBot CSV ────────────────────────────────────
         file << "\nSPRAYERBOT LOG\n"
              << "Session,Mode,Chemical,AreaSprayed,ChemicalUsed\n";
 
@@ -92,7 +123,6 @@ void writeLogsToFile(const SeedingBot&    seeder,
             }
         }
 
-        // ── HarvestingBot CSV ─────────────────────────────────
         file << "\nHARVESTINGBOT LOG\n"
              << "Session,CropName,Status,YieldKg\n";
 
@@ -113,8 +143,6 @@ void writeLogsToFile(const SeedingBot&    seeder,
         // ══════════════════════════════════════════════════════
         //  TXT FORMAT
         // ══════════════════════════════════════════════════════
-
-        // ── SeedingBot TXT ────────────────────────────────────
         file << "========================================\n"
              << "           SeedingBot Log\n"
              << "========================================\n"
@@ -139,7 +167,6 @@ void writeLogsToFile(const SeedingBot&    seeder,
             }
         }
 
-        // ── SprayerBot TXT ────────────────────────────────────
         file << "\n========================================\n"
              << "           SprayerBot Log\n"
              << "========================================\n"
@@ -159,7 +186,6 @@ void writeLogsToFile(const SeedingBot&    seeder,
             }
         }
 
-        // ── HarvestingBot TXT ─────────────────────────────────
         file << "\n========================================\n"
              << "          HarvestingBot Log\n"
              << "========================================\n"
