@@ -52,6 +52,7 @@ CropData SeedingBot::plantSeeds(int count, const vector<CropData>& crops) {
     
     assignedCrop  = crops[choice - 1];
     seedsPlanted += count;
+    seedLog.push_back(assignedCrop);
 
     std::cout << name << ": Planting " << count
          << " " << assignedCrop.getName()                              << " seeds\n"
@@ -85,17 +86,26 @@ cout << "\n=== Selected Crop Data ===\n"
 
 void SeedingBot::statusReport() const {
     Robot::statusReport();
-    std::cout << "  Crop         : " << assignedCrop.getName()               << "\n"
-         << "  Time to Grow : " << assignedCrop.getTimeToGrow()         << " days\n"
-         << "  Humidity     : " << assignedCrop.getMinHum()
-                                << " - " << assignedCrop.getMaxHum()    << " %\n"
-         << "  Temperature  : " << assignedCrop.getMinTemp()
-                                << " - " << assignedCrop.getMaxTemp() << " C\n"
-         << "  UV Intensity : " << assignedCrop.getMinUV()
-                                << " - " << assignedCrop.getMaxUV()<< "\n"
-         << "  Water/day    : " << assignedCrop.getWaterReq()  << " mL\n"
-         << "  Seeds Planted: " << seedsPlanted                         << "\n";
+    std::cout << "  Seeds Planted: " << seedsPlanted << "\n";
+
+    if (!seedLog.empty()) {
+        std::cout << "  Seed Log:\n";
+        for (size_t i = 0; i < seedLog.size(); ++i) {
+            std::cout << "    Session " << i + 1
+                      << " : "       << seedLog[i].getName()
+                      << " | Time to Grow  : " << seedLog[i].getTimeToGrow() << " days"
+                      << " | Water/day     : " << seedLog[i].getWaterReq()   << " mL"
+                      << " | Humidity      : " << seedLog[i].getMinHum()
+                                               << " - " << seedLog[i].getMaxHum()  << " %"
+                      << " | Temperature   : " << seedLog[i].getMinTemp()
+                                               << " - " << seedLog[i].getMaxTemp() << " C"
+                      << " | UV Intensity  : " << seedLog[i].getMinUV()
+                                               << " - " << seedLog[i].getMaxUV()   << "\n";
+        }
+    }
 }
+
+// use seeder.statusReport() function to get the log for all the plants 
 
 // ══════════════════════════════════════════════════════════════
 //  SPRAYER BOT
@@ -177,6 +187,13 @@ std::string SprayerBot::sprayArea(double areaSqM) {
     tankLevelL -= required;
     ++spraySessionsDone;
 
+    sprayLog.push_back({
+        modeToString(mode),
+        chemicalName,
+        areaSqM,
+        required
+    });
+
     std::cout << "\n" << name << ": Sprayed " << areaSqM
               << " m² with "  << chemicalName
               << " ("         << modeToString(mode) << ")\n"
@@ -188,18 +205,32 @@ std::string SprayerBot::sprayArea(double areaSqM) {
 
 void SprayerBot::statusReport() const {
     Robot::statusReport();
-    std::cout << "  Mode         : " << modeToString(mode) << "\n"
-              << "  Chemical     : " << chemicalName        << "\n"
-              << "  Tank         : " << tankLevelL
-                                     << " / " << tankCapacityL << " L\n"
-              << "  Spray Rate   : " << sprayRateL_per_m2   << " L/m²\n"
-              << "  Sessions Done: " << spraySessionsDone    << "\n";
+    cout << "  Mode         : " << modeToString(mode) << "\n"
+         << "  Chemical     : " << chemicalName        << "\n"
+         << "  Tank         : " << tankLevelL
+                                << " / " << tankCapacityL << " L\n"
+         << "  Spray Rate   : " << sprayRateL_per_m2   << " L/m²\n"
+         << "  Sessions Done: " << spraySessionsDone    << "\n";
+
+    // ── Print spray log ───────────────────────────────────────
+    if (!sprayLog.empty()) {
+        cout << "  Spray Log:\n";
+        for (size_t i = 0; i < sprayLog.size(); ++i) {
+            cout << "    Session " << i + 1
+                 << " | " << sprayLog[i].mode
+                 << " | " << sprayLog[i].chemicalName
+                 << " | " << sprayLog[i].areaSprayed  << " m²"
+                 << " | " << sprayLog[i].chemicalUsed << " L\n";
+        }
+    } else {
+        cout << "  Spray Log: (none)\n";
+    }
 }
 
 /*
 SprayerBot sprayer("SP01", 100.0, 0.5);  // to initialise 
-sprayer.sprayArea(10.0);  // to use action
-
+string chemical = sprayer.sprayArea(10.0); // runs the function abd stores the name of what was sprayed
+sprayer.statusReport()  // prints the entire log for what was sprayed
 
 */
 
@@ -222,15 +253,27 @@ HarvestingBot::HarvestingBot(const std::string& id)
       totalPlantKg(0.0),
       harvests(0) {}
 
-bool HarvestingBot::evaluateAndHarvest(const CropData   farm[3][3],
-                                       int              r,
-                                       int              c,
+std::string HarvestingBot::statusToString(Plot::Status status) {
+    switch (status) {
+        case Plot::Status::SEED:  return "Seed";
+        case Plot::Status::PLANT: return "Plant";
+        case Plot::Status::DEAD:  return "Dead";
+    }
+    return "Unknown";
+}
+
+HarvestingBot::HarvestingBot(const std::string& id)
+    : Robot(id, "HarvestingBot-" + id),
+      totalHarvestedKg(0.0),
+      totalDeadKg(0.0),
+      totalPlantKg(0.0),
+      harvests(0) {}
+
+bool HarvestingBot::evaluateAndHarvest(const CropData&  cropData,
                                        Plot::Status status) {
-    // ── Step 1: Get CropData from farm array ──────────────────
-    CropData    cropData = farm[r][c];
     std::string cropName = cropData.getName();
 
-    // ── Step 2: Generate random yield between 80-100% of 1kg ──
+    // ── Generate random yield between 80-100% of 1kg ──────────
     std::random_device             rd;
     std::mt19937                   gen(rd());
     std::uniform_real_distribution dist(0.80, 1.00);
@@ -239,17 +282,15 @@ bool HarvestingBot::evaluateAndHarvest(const CropData   farm[3][3],
     double percentage    = dist(gen);
     double expectedYield = maxYieldKg * percentage;
 
-    std::cout << name << ": Scanning plot ["
-              << r << "][" << c << "]\n"
-              << "  Crop          : " << cropName                  << "\n"
-              << "  Plot Status   : " << statusToString(status)    << "\n"
-              << "  Time to Grow  : " << cropData.getTimeToGrow()       << " days\n"
-              << "  Water/day     : " << cropData.getWaterReq() << " mL\n"
-              << "  Max Yield     : " << maxYieldKg                << " kg\n"
-              << "  Yield %       : " << percentage * 100          << "%\n"
-              << "  Expected Yield: " << expectedYield             << " kg\n";
+    std::cout << name << ": Harvesting " << cropName << "\n"
+              << "  Status        : " << statusToString(status)  << "\n"
+              << "  Time to Grow  : " << cropData.getTimeToGrow() << " days\n"
+              << "  Water/day     : " << cropData.getWaterReq()   << " mL\n"
+              << "  Max Yield     : " << maxYieldKg               << " kg\n"
+              << "  Yield %       : " << percentage * 100         << "%\n"
+              << "  Expected Yield: " << expectedYield            << " kg\n";
 
-    // ── Step 3: Calculate yield based on status ───────────────
+    // ── Calculate yield based on status ───────────────────────
     switch (status) {
         case Plot::Status::SEED:
             std::cout << "  Seed detected – too early. Skipping.\n";
@@ -284,11 +325,6 @@ bool HarvestingBot::evaluateAndHarvest(const CropData   farm[3][3],
     return false;
 }
 
-/*
-SprayerBot sprayer("SP01", 100.0, 0.5);   //to initialise the sprayerbot
-string chemical = sprayer.sprayArea(10.0); // string chemical stores the name of what was sprayed.
-*/
-
 void HarvestingBot::statusReport() const {
     Robot::statusReport();
     std::cout << "  Harvests Done  : " << harvests         << "\n"
@@ -322,3 +358,11 @@ void HarvestingBot::statusReport() const {
         if (!anyDead) std::cout << "      (none)\n";
     }
 }
+
+/*
+── get status from plot ──────────────────────────
+    Plot::Status status = farm[r][c].getStatus();  // please change to what to what ur status thing is
+
+── harvestbot reads from farm array ─────────────
+    harvester.evaluateAndHarvest(farm, r, c, status); // after this please clear the plot at ur side
+*/

@@ -10,6 +10,7 @@ class SeedingBot : public Robot {
 private:
     CropData assignedCrop;
     int  seedsPlanted;
+    vector<CropData>   seedLog;   
 
 public:
     SeedingBot(const string& id, const CropData& crop);
@@ -23,4 +24,5 @@ public:
     int    getTimeToGrow()   const { return assignedCrop.getTimeToGrow();       }
     int    getWaterNeeded()  const { return assignedCrop.getWaterReq(); }
     int    getSeedsPlanted() const { return seedsPlanted;                       }
+    const vector<CropData>& getSeedLog() const { return seedLog; }
 };

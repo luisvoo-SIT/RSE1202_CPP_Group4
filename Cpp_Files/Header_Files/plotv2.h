@@ -12,11 +12,12 @@ class Plot {
     public:
         float currentTemp = 20.0;
         float currentHum = 60.0;
-        float currentWater = 50.0;
+        unsigned int currentWater = 0;
         string cropName = "Empty";
 
-        enum Status { SEED, PLANT, DEAD };
-        int cropstatus;
+        enum Status { SEED, PLANT, DEAD, EMPTY};
+        const string StatusNames[4] = {"Seed", "Plant", "Dead", "Empty"};
+        int cropstatus=3;
 
         char symbol = ' ';
         int PlotTime = 0; //how long the crop has been planted for - will be cleared for timecontrol.cpp
@@ -25,7 +26,7 @@ class Plot {
         Plot() = default;
 
         // Plot constructor
-        Plot(float cTemp, float cHum, float cWater){
+        Plot(float cTemp, float cHum, unsigned int cWater){
             currentTemp = cTemp;
             currentHum = cHum;
             currentWater = cWater;

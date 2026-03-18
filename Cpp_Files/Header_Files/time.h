@@ -3,15 +3,17 @@
 using namespace std;
 
 class TimeControl {
-private:
-    int PlotTime;
-    int GlobalTime;
+protected:
+    int PlotTime=0;
+    int GlobalTime=0;
 
 public:
-    TimeControl();
-
-    void advancePlotTime();
-    void resetPlotTime();
+    void advancePlotTime(int PlotTime);
+    void resetPlotTime(int PlotTime);
+/*
+    void advanceGlobalTime();
+    void resetGlobalTime();
+*/
     int getPlotTime() const;
-    int getGlobalTime() const;
+    //int getGlobalTime() const;
 };
