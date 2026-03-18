@@ -114,14 +114,14 @@ SprayerBot::SprayerBot(const std::string& id,
                        double             tankCapacityL,
                        double             sprayRate)
     : Robot(id, "SprayerBot-" + id),
-      mode(SprayMode::FERTILIZER),     // ← default mode
+      mode(SprayMode::FERTILIZER),
       tankCapacityL(tankCapacityL),
       tankLevelL(tankCapacityL),
       sprayRateL_per_m2(sprayRate),
       chemicalName(""),
       spraySessionsDone(0) {}
 
-bool SprayerBot::sprayArea(double areaSqM) {
+std::string SprayerBot::sprayArea(double areaSqM) {
     // ── Step 1: User selects spray mode ──────────────────────
     std::cout << "\n=== Select Spray Mode ===\n"
               << "1. Fertilizer\n"
@@ -132,6 +132,7 @@ bool SprayerBot::sprayArea(double areaSqM) {
     int modeChoice;
     std::cin >> modeChoice;
 
+    // ── Step 2: Set chemical name based on mode ───────────────
     switch (modeChoice) {
         case 1:
             mode         = SprayMode::FERTILIZER;
@@ -151,17 +152,6 @@ bool SprayerBot::sprayArea(double areaSqM) {
             break;
     }
 
-    // ── Step 2: User can enter custom chemical name ───────────
-    std::cout << "Default chemical: " << chemicalName << "\n"
-              << "Use custom chemical name? (y/n): ";
-    char custom;
-    std::cin >> custom;
-
-    if (custom == 'y' || custom == 'Y') {
-        std::cout << "Enter chemical name: ";
-        std::cin  >> chemicalName;
-    }
-
     // ── Step 3: Check if tank needs refilling ─────────────────
     double required = areaSqM * sprayRateL_per_m2;
 
@@ -179,7 +169,7 @@ bool SprayerBot::sprayArea(double areaSqM) {
             std::cout << "  Tank refilled to " << tankCapacityL << " L\n";
         } else {
             std::cout << "  Spraying cancelled.\n";
-            return false;
+            return "";      // ← return empty string on failure
         }
     }
 
@@ -187,13 +177,13 @@ bool SprayerBot::sprayArea(double areaSqM) {
     tankLevelL -= required;
     ++spraySessionsDone;
 
-    std::cout << "\n" << name << ": Spraying " << areaSqM
-              << " m² with " << chemicalName
-              << " (" << modeToString(mode) << ")\n"
+    std::cout << "\n" << name << ": Sprayed " << areaSqM
+              << " m² with "  << chemicalName
+              << " ("         << modeToString(mode) << ")\n"
               << "  Used     : " << required   << " L\n"
               << "  Remaining: " << tankLevelL << " L\n";
 
-    return true;
+    return chemicalName;    // ← only return chemical name
 }
 
 void SprayerBot::statusReport() const {
@@ -205,6 +195,13 @@ void SprayerBot::statusReport() const {
               << "  Spray Rate   : " << sprayRateL_per_m2   << " L/m²\n"
               << "  Sessions Done: " << spraySessionsDone    << "\n";
 }
+
+/*
+SprayerBot sprayer("SP01", 100.0, 0.5);  // to initialise 
+sprayer.sprayArea(10.0);  // to use action
+
+
+*/
 
 // ══════════════════════════════════════════════════════════════
 //  HARVESTING BOT
@@ -288,7 +285,8 @@ bool HarvestingBot::evaluateAndHarvest(const CropData   farm[3][3],
 }
 
 /*
-sss
+SprayerBot sprayer("SP01", 100.0, 0.5);   //to initialise the sprayerbot
+string chemical = sprayer.sprayArea(10.0); // string chemical stores the name of what was sprayed.
 */
 
 void HarvestingBot::statusReport() const {
