@@ -10,6 +10,7 @@ class SeedingBot : public Robot {
 private:
     CropData assignedCrop;
     int  seedsPlanted;
+    vector<CropData>   seedLog;   
 
 public:
     SeedingBot(const string& id, const CropData& crop);
