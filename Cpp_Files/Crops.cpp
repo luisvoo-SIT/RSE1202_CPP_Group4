@@ -50,7 +50,7 @@ vector<CropData> CropData::loadCrops() {
         crops.push_back(CropData(name, minH, maxH, minT, maxT,
                                   minUV, maxUV, water, time));
 
-        cout << "Loaded crop: " << name << "\n";
+        //cout << "Loaded crop: " << name << "\n";
     }
     return crops;
 }
@@ -93,10 +93,7 @@ void testUserInput() {
 
 }
 */
-<<<<<<< HEAD
-=======
 
->>>>>>> origin/main
 /*
 int main(){
     vector<CropData> availableCrops = CropData::loadCrops();
