@@ -40,5 +40,6 @@ public:
     double      getTankLevel()     const { return tankLevelL;       }
     double      getTankCapacity()  const { return tankCapacityL;    }
     int         getSpraySessions() const { return spraySessionsDone;}
-    string getChemicalName()  const { return chemicalName;     }
+    string      getChemicalName()  const { return chemicalName;     }
+    const vector<SprayRecord>& getSprayLog() const { return sprayLog; }
 };
