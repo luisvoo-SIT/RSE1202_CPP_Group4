@@ -268,6 +268,13 @@ sprayer.statusReport()  // prints the entire log for what was sprayed
 //  HARVESTING BOT
 // ══════════════════════════════════════════════════════════════
 
+HarvestingBot::HarvestingBot(const std::string& id)
+    : Robot(id, "HarvestingBot-" + id),
+      totalHarvestedKg(0.0),
+      totalDeadKg(0.0),
+      totalPlantKg(0.0),
+      harvests(0) {}
+
 std::string HarvestingBot::statusToString(Plot::Status status) {
     switch (status) {
         case Plot::Status::SEED:  return "Seed";
@@ -276,13 +283,6 @@ std::string HarvestingBot::statusToString(Plot::Status status) {
     }
     return "Unknown";
 }
-
-HarvestingBot::HarvestingBot(const std::string& id)
-    : Robot(id, "HarvestingBot-" + id),
-      totalHarvestedKg(0.0),
-      totalDeadKg(0.0),
-      totalPlantKg(0.0),
-      harvests(0) {}
 
 bool HarvestingBot::evaluateAndHarvest(const CropData&  cropData,
                                        Plot::Status status) {
