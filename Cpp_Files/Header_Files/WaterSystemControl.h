@@ -7,7 +7,7 @@ class WaterSystemControl : public Actuator
 {
     public:
         // Function to adjust water level that takes in current water level as parameter
-        void adjustWater(float &currentWater);
+        void adjustWater(unsigned int &currentWater);  
 
 };
 
