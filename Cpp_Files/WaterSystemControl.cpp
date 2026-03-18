@@ -1,9 +1,10 @@
 #include "WaterSystemControl.h"
 
-void WaterSystemControl::adjustWater(float &currentWater) 
+void WaterSystemControl::adjustWater(unsigned int &currentWater) 
 {
-    double newWater; // Declares double variable to store updated water level (newWater)
-    string input; // Declares string variable to store user input for error handling (input)
+    
+    unsigned int newWater; // Declare unsigned int variable for new water level (newWater)
+    string input; // string variable to store user input for error handling
 
     // Prompt user to key in value from 0-10
     cout << "Enter water value (0-10): ";
@@ -48,7 +49,7 @@ void WaterSystemControl::adjustWater(float &currentWater)
 
         // Try to parse the string as a double variable type
         std::istringstream iss(input);      // Creates an istringsteam object initialized with the string variable (i.e input)
-        double parsedValue;                 // declares double variable called "parsedValue", it holds the user input value if parsing succeeds
+        unsigned int parsedValue;                 // declares unsigned int variable called "parsedValue", it holds the user input value if parsing succeeds
         char leftover;                      // declares char variable called "leftover", it holds any unexpected character found after the user input 
 
         // Try to read double value from stream
@@ -80,5 +81,9 @@ void WaterSystemControl::adjustWater(float &currentWater)
     currentWater = newWater; // assigns new value (newWater) to current water level (currentWater)
 
     // Prints updated water level to console
-    cout << ">>> Water level has been updated to: " 
-    << std::fixed << std::setprecision(1) << currentWater << " litres" << endl; // setprecision(1) to output to 1 d.p.
+    cout << ">>> Water level has been updated to: " << currentWater << " litres" << endl;
+
+
+
+
+}
