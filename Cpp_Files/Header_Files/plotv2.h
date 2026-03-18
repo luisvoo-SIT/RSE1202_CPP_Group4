@@ -27,12 +27,15 @@ class Plot {
 
         // Default constructor
         Plot() = default;
-
+        void manageFarm();
         // Plot constructor
         Plot(float cTemp, float cHum, unsigned int cWater){
             currentTemp = cTemp;
             currentHum = cHum;
             currentWater = cWater;
+        
         }
+
+     //main function to manage the farm, will call other functions from plotv2.cpp
 };
 #endif

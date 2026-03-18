@@ -11,6 +11,7 @@
 #include "Header_Files/seedingBot.h"
 #include "Header_Files/SprayerBot.h"
 #include "Header_Files/HarvestBot.h"
+#include "Header_Files/FileWriter.h"
 
 //global time function
 #include "Header_Files/time.h"
@@ -317,7 +318,7 @@ void manageFarm() {
                                     break;
                                 case 7: //return to main menu
                                     cout << "Returning to main menu..." << endl;
-                                    //maincon.cpp
+                                    
                                     break;
                                 default:
                                     break;
@@ -333,12 +334,42 @@ void manageFarm() {
         else if (choice == 2) {
             //Return to Main Menu
             cout << "Returning to main menu..." << endl;
+            //where my int main at
         }
     }
 }
 
-//change function name
-int main() {
-    manageFarm();
-    return 0;
+int main()
+{
+    int choice;
+    cout << "\nWelcome to SAGE Farm!\n\n";
+    cout << "Initializing farm... choose an option: ";
+    cin>>choice;
+    switch (choice) {
+        case 1: 
+            //View Farm
+            cout << "Viewing farm..." << endl;
+            manageFarm(); 
+            break;
+            
+        case 2:
+            //Write Logs to File
+            cout << "Writing logs to file..." << endl;
+            writeLogsToFile(seeder, sprayer, harvester);
+            break;
+        
+        case 3:
+            cout << "\n Exiting SAGE Simulator.\n";
+            break;
+
+        default:
+            cout << "Invalid choice. Please enter 1 to view farm or 2 to return to main menu." << endl;
+            break;
+    }       
+    
+    /*
+    1. insert csv
+    2. gui - plots, output file, quit
+    
+    */
 }
