@@ -4,7 +4,13 @@
 #include <string>
 #include <sstream>
 #include <cstdlib>
-#include "Header_Files/Robots.h" //chee hui's bot functions
+
+//chee hui's bot functions
+#include "Header_Files/Robots.h" 
+#include "Header_Files/seedingBot.h"
+#include "Header_Files/SprayerBot.h"
+#include "Header_Files/HarvestBot.h"
+
 //#include "Header_Files/TimeControl.h"
 #include "Header_Files/WaterSystemControl.h" //dino water
 #include "Header_Files/CropsV2.h" //luis' crop data
@@ -16,13 +22,19 @@ using namespace std;
 
 //global variables:
 int farmchoice = 0;
+
+//things to initialize:
 WaterSystemControl wsc;
-Plot::Status cropstatus;
-//SeedingBot sbot; do i need a global variable to make the bots work?
+Plot::Status cropstatus (int i, int r, int c);
+string seedbotname = "S01";
+ // Initialize with default crop, will be updated when user plants
+//HarvestingBot harvester ("H01"); //harvest bot initialization
+// SprayerBot sprayer ("P01"); //sprayer bot initialization
 
 //global vector initialization:
 vector<CropData> availableCrops = CropData::loadCrops();
 vector<vector<Plot>> farm(3, vector<Plot>(3));
+SeedingBot seeder (seedbotname, availableCrops[0]);
 
 void displayFarm(const vector<vector<Plot>>& farm) {
     cout << "\n--- VERTICAL FARM 3x3 SECTOR GRID ---" << endl;
@@ -176,13 +188,13 @@ void manageFarm() {
 
                     // Display the metadata -- override w chee hui's
                     cout << "-------------------------------" << endl;
-                    /*
+                    
                     cout << "Crop Name:   " << farm[r][c].cropName << endl;
                     cout << "Temperature: " << farm[r][c].currentTemp << "°C" << endl;
                     cout << "Humidity:    " << farm[r][c].currentHum << "%" << endl;
                     cout << "Water Level: " << farm[r][c].currentWater << endl;
-                    cout << "Time Planted: " <<  << " days" << endl;
-                    */
+                    //cout << "Time Planted: " <<  << " days" << endl;
+                    
 
                     //add day, global day variable
                     cout << "-------------------------------" << endl;
@@ -222,6 +234,19 @@ void manageFarm() {
                                         cout << "we need da plant" << endl;
                                         //cheehui seeding bot
                                         //SeedingBot();
+                                        CropData plant = seeder.plantSeeds(1, availableCrops);  //to store the returned object into the array
+                                        farm[r][c].cropName = plant.getName();
+                                        // ── Access all crop data through the returned object ──────────
+                                        cout << "\n=== Selected Crop Data ===\n"
+                                            << "  Crop         : " << plant.getName()             << "\n"
+                                            << "  Time to Grow : " << plant.getTimeToGrow()       << " days\n"
+                                            << "  Water/day    : " << plant.getWaterReq()<< " mL\n"
+                                            << "  Humidity     : " << plant.getMinHum()
+                                            << " - " << plant.getMaxHum() << " %\n"
+                                            << "  Temperature  : " << plant.getMinTemp()
+                                                                    << " - " << plant.getMaxTemp() << " C\n"
+                                            << "  UV Intensity : " << plant.getMinUV()
+                                                                    << " - " << plant.getMaxUV() << "\n";
                                         //initialize time object, and run the plotTime ++ function
                                     }
                                     else{
@@ -292,9 +317,10 @@ void manageFarm() {
 }
 
 
-int cropstatus (int i, int r, int c) { //need to add time parameter 
+int cropstatus () { //need to add time parameter 
     int warning = 0; 
-    
+    int i, r, c;
+
     availableCrops[i].getWaterReq(); //get water requirement for specific crop
     if (farm[r][c].currentWater <= (availableCrops[i].getWaterReq() + 5) || (farm[r][c].currentWater > (availableCrops[i].getWaterReq() - 5))) { //if current water level is not within 5 units of water requirement, crop is dying
         warning++;
@@ -315,7 +341,11 @@ int cropstatus (int i, int r, int c) { //need to add time parameter
         return 2;
     }
     else cout << "No crop." << endl;  
+
+    return 3;
+
 }
+    
 
 //change function name
 int main() {
