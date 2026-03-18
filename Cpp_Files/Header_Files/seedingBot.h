@@ -8,19 +8,19 @@ using namespace std;
 
 class SeedingBot : public Robot {
 private:
-    Crop assignedCrop;
+    CropData assignedCrop;
     int  seedsPlanted;
 
 public:
-    SeedingBot(const string& id, const Crop& crop);
+    SeedingBot(const string& id, const CropData& crop);
 
-    void   setCrop(const Crop& crop) { assignedCrop = crop; }
+    void   setCrop(const CropData& crop) { assignedCrop = crop; }
 
-    string plantSeeds(int count, const vector<Crop>& crops);
+    CropData plantSeeds(int count, const vector<CropData>& crops);
     void   statusReport() const;
 
     string getCropName()     const { return assignedCrop.getName();             }
-    int    getTimeToGrow()   const { return assignedCrop.getTimetoGrow();       }
-    int    getWaterNeeded()  const { return assignedCrop.getwaterRequirements(); }
+    int    getTimeToGrow()   const { return assignedCrop.getTimeToGrow();       }
+    int    getWaterNeeded()  const { return assignedCrop.getWaterReq(); }
     int    getSeedsPlanted() const { return seedsPlanted;                       }
 };

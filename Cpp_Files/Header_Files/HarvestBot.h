@@ -1,38 +1,35 @@
 #pragma once
 #include "Robots.h"
+#include "plotv2.h"
+#include "CropsV2.h"
+#include "seedingBot.h"
 #include <string>
 #include <vector>
 
-using namespace std;
-
 class HarvestingBot : public Robot {
-public:
-    enum class PlantStatus { SEED, PLANT, DEAD };
-
 private:
     struct HarvestRecord {
-        string      cropType;
-        PlantStatus status;
-        double      yieldKg;
+        std::string      cropName;
+        Plot::Status status;
+        double           yieldKg;
     };
 
-    string                cropType;
-    double                totalHarvestedKg;
-    double                totalDeadKg;
-    double                totalPlantKg;
-    int                   harvests;
-    vector<HarvestRecord> log;
+    double                     totalHarvestedKg;
+    double                     totalDeadKg;
+    double                     totalPlantKg;
+    int                        harvests;
+    std::vector<HarvestRecord> log;
 
-    static string statusToString(PlantStatus status);
+    static std::string statusToString(Plot::Status status);
 
 public:
-    HarvestingBot(const string& id, const string& cropType);
+    HarvestingBot(const std::string& id);
 
-    void setCropType(const string& crop) { cropType = crop; }
+    bool evaluateAndHarvest(const CropData   farm[3][3],
+                            int              r,
+                            int              c,
+                            Plot::Status status);
 
-    bool evaluateAndHarvest(const string& zone,
-                            double        expectedYieldKg,
-                            PlantStatus   status);
     void statusReport() const;
 
     double getTotalHarvested() const { return totalHarvestedKg; }

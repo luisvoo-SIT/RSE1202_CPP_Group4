@@ -15,6 +15,7 @@ class Plot {
         float currentWater = 50.0;
         string cropName = "Empty";
         char symbol = ' ';
+        int PlotTime = 0; //how long the crop has been planted for - will be cleared for timecontrol.cpp
 
         // Default constructor
         Plot() = default;

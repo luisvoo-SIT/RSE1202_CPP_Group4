@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 #include <string>
 
 using namespace std;
@@ -14,6 +15,6 @@ public:
 
     void statusReport() const;
 
-    const string& getName() const { return name; }
+    const string& getRobName() const { return name; }
     const string& getId()   const { return id;   }
 };
