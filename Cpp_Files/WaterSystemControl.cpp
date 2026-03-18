@@ -2,10 +2,10 @@
 #include <limits>
 
 
-void WaterSystemControl::adjustWater(unsigned int &currentWater) 
+void WaterSystemControl::adjustWater(int &currentWater) 
 {
     
-    unsigned int newWater; // Declare unsigned int variable for new water level (newWater)
+    int newWater; // Declare unsigned int variable for new water level (newWater)
     string input; // string variable to store user input for error handling
 
     // Prompt user to key in value from 0-10

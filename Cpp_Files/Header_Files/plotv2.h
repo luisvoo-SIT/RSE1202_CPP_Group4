@@ -12,7 +12,10 @@ class Plot {
     public:
         float currentTemp = 20.0;
         float currentHum = 60.0;
-        unsigned int currentWater = 0;
+        int currentWater = 0;
+        bool fertilizersprayed = false;
+        bool pestsprayed = false;
+        bool herbsprayed = false;
         string cropName = "Empty";
 
         enum Status { SEED, PLANT, DEAD, EMPTY};
