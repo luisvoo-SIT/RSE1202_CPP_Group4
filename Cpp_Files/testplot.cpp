@@ -5,6 +5,7 @@
 #include <sstream>
 #include <cstdlib>
 
+
 //chee hui's bot functions
 #include "Header_Files/Robots.h" 
 #include "Header_Files/seedingBot.h"
@@ -128,8 +129,10 @@ void manageFarm() {
                     cout << "Crop Status: " << farm[r][c].StatusNames[farm[r][c].cropstatus] << endl;
                     cout << "Temperature: " << farm[r][c].currentTemp << "°C" << endl;
                     cout << "Humidity:    " << farm[r][c].currentHum << "%" << endl;
-                    cout << "Water Level: " << farm[r][c].currentWater << endl;
+                    if (farm[r][c].currentWater < 0) farm[r][c].currentWater = 0; //if water level goes below 0, set it to 0
+                    cout << "Water Level: " << farm[r][c].currentWater << endl; //set to 0 if water level goes below 0 in time skipping logic
                     cout << "Time Planted: " << farm[r][c].PlotTime << " days" << endl;
+                    cout << "Global Time: " << GlobalTime << " days" << endl;
 
                     //spray details
                     cout << "Fertilizer Applied: " << (farm[r][c].fertilizersprayed ? "Yes" : "No") << endl;
@@ -186,7 +189,6 @@ void manageFarm() {
                                             << "  UV Intensity : " << plant.getMinUV()
                                             << " - " << plant.getMaxUV() << "\n";
                                         farm[r][c].cropstatus = Plot::Status::SEED; //set plot status to seed
-                                        //initialize time object, and run the plotTime ++ function
                                     }
                                     else{
                                         cout << "Plot already has a crop." << endl;
@@ -253,63 +255,61 @@ void manageFarm() {
                                     int warning;
                                     int i;
                                     cout << "How many days to skip? Please enter a number between 0 and 365: " << endl;
-                                    cin  >> skip;
-                                    while(true) {
-                                        if(!(cin >> skip)) {
-                                            cout << "Invalid input type. Please enter a number between 0 and 365: " << endl;
-                                            cin.clear();
-                                            cin.ignore(1000, '\n');
-                                            continue;
-                                        }
-                                        if (skip > 365 || skip < 0) {
-                                            cout << "Invalid number of days. Please enter a number between 0 and 365." << endl;
-                                            cin.clear();
-                                            cin.ignore(1000, '\n');
-                                            continue;
-                                        }
-                                        else {
-                                            break;
-                                        }
+                                    cin >> skip; //get user input for how many days to skip
+                                    //error handling for user input
+                                    while (cin.fail() || skip < 0 || skip > 365 || (cin.peek() != '\n' && cin.peek() != EOF)) {
+                                        cin.clear(); //clear error flag
+                                        cin.ignore(1000, '\n'); //discard invalid input
+                                        cout << "Invalid input. Please enter a number between 0 and 365: " << endl;
+                                        cin >> skip; //get user input again
                                     }
 
-                                    //crop status logic
-                                    availableCrops[0].getWaterReq(); //get water requirement for specific crop
-                                    if (farm[r][c].currentWater > (availableCrops[i].getWaterReq() + 5) || (farm[r][c].currentWater < (availableCrops[i].getWaterReq() - 5))) { //if current water level is not within 5 units of water requirement, crop is dying
-                                        warning++;
-                                        cout << "Your crop is dying." << endl;
-                                        cout << "water req." << availableCrops[0].getWaterReq() << endl;
-                                        cout << "current water." << farm[r][c].currentWater << endl;
+                                    //crop status water level logic
+                                    if (farm[r][c].cropName == "Empty"){ //if (farm[r][c].cropName != "Empty") - replace current statement w this once seeding bot is working:
+                                        farm[r][c].currentWater = 0; //if no crop, water level stays at 0
+                                        GlobalTime += skip; //if no crop, just advance global time
+                                        cout << "No crop to advance time for." << endl;
+                                        cout << "Global Time has been advanced by " << skip << " days." << endl;
                                     }
-                                    else {  
-                                        warning = 0; //reset warning if water level is good
-                                    } 
+                                    else {
+                                        availableCrops[0].getWaterReq(); //get water requirement for specific crop
+                                        farm[r][c].currentWater -= (skip * availableCrops[i].getWaterReq()); //decrease water level by water requirement each day 
+                                        if (farm[r][c].currentWater < 0) farm[r][c].currentWater = 0; //if water level goes below 0, set it to 0  
+                                        if (farm[r][c].currentWater > (availableCrops[i].getWaterReq() + 5) || (farm[r][c].currentWater < (availableCrops[i].getWaterReq() - 5)) || (farm[r][c].currentWater == 0)) { //if current water level is not within 5 units of water requirement, crop is dying
+                                            warning++;
+                                            cout << "Your crop is dying." << endl;
+                                            cout << "water req." << availableCrops[0].getWaterReq() << endl;
+                                            cout << "current water." << farm[r][c].currentWater << endl;
                                     
-                                    if (warning == 2) { //if warning reaches 2, crop dies
-                                        farm[r][c].cropstatus = 2;
-                                       
-                                    }
-                                    else if (farm[r][c].PlotTime < availableCrops[i].getTimeToGrow()) { //if time is less than time to grow, crop is a seedling
-                                        farm [r][c].cropstatus = 0;
-                                        
-                                    }
-                                    else if (farm[r][c].PlotTime >= availableCrops[i].getTimeToGrow()) { //if time is greater than or equal to time to grow, crop is harvestable
-                                        farm[r][c].cropstatus = 1;
-                                        
-                                    }
-                                    else cout << "No crop." << endl;
-                                     
-                                    //plot logic for time skipping
-                                    farm[r][c].PlotTime += skip;
-                                    farm[r][c].currentWater -= availableCrops[i].getWaterReq(); //decrease water level by water requirement each day
-                                    cout<< endl << farm[r][c].PlotTime <<endl;
-                                    cout << farm[r][c].currentWater << endl;
-                                    cout<<farm[r][c].cropstatus<<endl;
+                                            if (warning == 2) { //if warning reaches 2, crop dies
+                                                farm[r][c].cropstatus = 2;
+                                            
+                                            }
+                                            else if (farm[r][c].PlotTime < availableCrops[i].getTimeToGrow()) { //if time is less than time to grow, crop is a seedling
+                                                farm [r][c].cropstatus = 0;
+                                                
+                                            }
+                                            else if (farm[r][c].PlotTime >= availableCrops[i].getTimeToGrow()) { //if time is greater than or equal to time to grow, crop is harvestable
+                                                farm[r][c].cropstatus = 1;
+                                                
+                                            }
+                                            else cout << "No crop." << endl;
+
+                                            farm[r][c].PlotTime += skip;
+                                            GlobalTime += skip; //advance global time by skip
+                                            farm[r][c].currentWater -= availableCrops[i].getWaterReq(); //decrease water level by water requirement each day
+                                            cout<< "Plot time: " << farm[r][c].PlotTime <<endl;
+                                            cout << "Global time: " << GlobalTime << endl;   
+                                            cout << "Crop status: " << farm[r][c].cropstatus << endl;  
+                                        }  
                                     break;
+                                    }
                                 case 6: //watering plants
                                     cout << "feeeeeeeeed" << endl;
                                     if (farm[r][c].cropName != "Empty"){ //if (farm[r][c].cropName != "Empty") - replace current statement w this once seeding bot is working:
                                         cout << "feed me" << endl;
                                         wsc.adjustWater(farm[r][c].currentWater); //dinowater
+                                        cout << "Current water level: " << farm[r][c].currentWater << endl;
                                     }
                                     else{
                                         cout << "No crop to water." << endl;
