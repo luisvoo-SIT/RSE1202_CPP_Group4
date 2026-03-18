@@ -2,27 +2,25 @@
 #include "Robots.h"
 #include "CropsV2.h"
 #include <string>
-
-using namespace std;
+#include <vector>
 
 using namespace std;
 
 class SeedingBot : public Robot {
 private:
-    Crop assignedCrop;
+    CropData assignedCrop;
     int  seedsPlanted;
 
 public:
-    SeedingBot(const string& id, const Crop& crop);
+    SeedingBot(const string& id, const CropData& crop);
 
-    void setCrop(const Crop& crop){assignedCrop =crop;}
+    void   setCrop(const CropData& crop) { assignedCrop = crop; }
 
+    CropData plantSeeds(int count, const vector<CropData>& crops);
+    void   statusReport() const;
 
-
-    void plantSeeds(int count);
-
-    void performTask()        override;
-    void statusReport() const override;
-
-    int getSeedsPlanted() const { return seedsPlanted; }
+    string getCropName()     const { return assignedCrop.getName();             }
+    int    getTimeToGrow()   const { return assignedCrop.getTimeToGrow();       }
+    int    getWaterNeeded()  const { return assignedCrop.getWaterReq(); }
+    int    getSeedsPlanted() const { return seedsPlanted;                       }
 };

@@ -1,6 +1,6 @@
 #pragma once
-#include <string>
 #include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -8,27 +8,13 @@ class Robot {
 protected:
     string id;
     string name;
-    double batteryLevel;
-    bool   isOperational;
-
-    void consumeBattery(double amount);
 
 public:
     Robot(const string& id, const string& name);
+    ~Robot() {}
 
-    virtual ~Robot();
+    void statusReport() const;
 
-    virtual void performTask() = 0;
-
-    virtual void recharge();
-    virtual void shutdown();
-    virtual void statusReport() const;
-
-    bool          getIsOperational() const { return isOperational; }
-    double        getBatteryLevel()  const { return batteryLevel;  }
-    const string& getName()          const { return name;          }
-
-
-
-
+    const string& getRobName() const { return name; }
+    const string& getId()   const { return id;   }
 };
