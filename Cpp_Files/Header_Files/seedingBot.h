@@ -24,4 +24,5 @@ public:
     int    getTimeToGrow()   const { return assignedCrop.getTimeToGrow();       }
     int    getWaterNeeded()  const { return assignedCrop.getWaterReq(); }
     int    getSeedsPlanted() const { return seedsPlanted;                       }
+    const vector<CropData>& getSeedLog() const { return seedLog; }
 };
