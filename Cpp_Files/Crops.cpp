@@ -93,7 +93,10 @@ void testUserInput() {
 
 }
 */
+<<<<<<< HEAD
+=======
 
+>>>>>>> origin/main
 /*
 int main(){
     vector<CropData> availableCrops = CropData::loadCrops();

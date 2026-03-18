@@ -3,7 +3,10 @@
 #include "Header_Files/SprayerBot.h"
 #include "Header_Files/HarvestBot.h"
 #include "Header_Files/CropsV2.h"
+#include "Header_Files/plotv2.h"
+
 #include <iostream>
+#include <random>
 
 using namespace std;
 
@@ -27,10 +30,10 @@ SeedingBot::SeedingBot(const string& id, const CropData& crop)
       assignedCrop(crop),
       seedsPlanted(0) {}
 
-string SeedingBot::plantSeeds(int count, const vector<CropData>& crops) {
+CropData SeedingBot::plantSeeds(int count, const vector<CropData>& crops) {
     if (crops.empty()) {
         std::cout << "No crops available.\n";
-        return "";
+        return assignedCrop;
     }
 
     // ── User selects seed type ────────────────────────────────
@@ -44,32 +47,53 @@ string SeedingBot::plantSeeds(int count, const vector<CropData>& crops) {
 
     if (choice < 1 || choice > (int)crops.size()) {
         std::cout << "Invalid choice.\n";
-        return "";
+        return assignedCrop;
     }
-
+    
     assignedCrop  = crops[choice - 1];
     seedsPlanted += count;
 
     std::cout << name << ": Planting " << count
          << " " << assignedCrop.getName()                              << " seeds\n"
-         << "  Time to Grow : " << assignedCrop.getTimetoGrow()        << " days\n"
-         << "  Water/day    : " << assignedCrop.getwaterRequirements() << " mL\n"
+         << "  Time to Grow : " << assignedCrop.getTimeToGrow()<< " days\n"
+         << "  Water/day    : " << assignedCrop.getWaterReq() << " mL\n"
          << "  Total Planted: " << seedsPlanted                        << "\n";
-
-    return assignedCrop.getName();
+    
+     
+    return assignedCrop;
 }
+
+/*
+This is the how to impliment the code
+
+
+CropData plant = seeder.plantSeeds(1, crops);  to store the returned object into the array
+farm[r][c] = plant
+// ── Access all crop data through the returned object ──────────
+cout << "\n=== Selected Crop Data ===\n"
+     << "  Crop         : " << farm[r][c].getName()             << "\n"
+     << "  Time to Grow : " << farm[r][c].getTimeToGrow()       << " days\n"
+     << "  Water/day    : " << farm[r][c].getWaterReq()<< " mL\n"
+     << "  Humidity     : " << farm[r][c].getMinHum()
+                            << " - " << farm[r][c].getMaxHum() << " %\n"
+     << "  Temperature  : " << farm[r][c].getMinTemp()
+                            << " - " << farm[r][c].getMaxTemp() << " C\n"
+     << "  UV Intensity : " << farm[r][c].getMinUV()
+                            << " - " << farm[r][c].getMaxUV() << "\n";
+*/
+
 
 void SeedingBot::statusReport() const {
     Robot::statusReport();
     std::cout << "  Crop         : " << assignedCrop.getName()               << "\n"
-         << "  Time to Grow : " << assignedCrop.getTimetoGrow()         << " days\n"
-         << "  Humidity     : " << assignedCrop.getminHumidity()
-                                << " - " << assignedCrop.getmaxHumidity()    << " %\n"
-         << "  Temperature  : " << assignedCrop.getminTemperature()
-                                << " - " << assignedCrop.getmaxTemperature() << " C\n"
-         << "  UV Intensity : " << assignedCrop.getminUVIntensity()
-                                << " - " << assignedCrop.getmaxUVIntensity() << "\n"
-         << "  Water/day    : " << assignedCrop.getwaterRequirements()  << " mL\n"
+         << "  Time to Grow : " << assignedCrop.getTimeToGrow()         << " days\n"
+         << "  Humidity     : " << assignedCrop.getMinHum()
+                                << " - " << assignedCrop.getMaxHum()    << " %\n"
+         << "  Temperature  : " << assignedCrop.getMinTemp()
+                                << " - " << assignedCrop.getMaxTemp() << " C\n"
+         << "  UV Intensity : " << assignedCrop.getMinUV()
+                                << " - " << assignedCrop.getMaxUV()<< "\n"
+         << "  Water/day    : " << assignedCrop.getWaterReq()  << " mL\n"
          << "  Seeds Planted: " << seedsPlanted                         << "\n";
 }
 
@@ -137,91 +161,114 @@ void SprayerBot::statusReport() const {
 // ══════════════════════════════════════════════════════════════
 //  HARVESTING BOT
 // ══════════════════════════════════════════════════════════════
-string HarvestingBot::statusToString(PlantStatus status) {
+std::string HarvestingBot::statusToString(Plot::Status status) {
     switch (status) {
-        case PlantStatus::SEED:  return "Seed";
-        case PlantStatus::PLANT: return "Plant";
-        case PlantStatus::DEAD:  return "Dead";
+        case Plot::Status::SEED:  return "Seed";
+        case Plot::Status::PLANT: return "Plant";
+        case Plot::Status::DEAD:  return "Dead";
     }
     return "Unknown";
 }
 
-HarvestingBot::HarvestingBot(const string& id, const string& cropType)
+HarvestingBot::HarvestingBot(const std::string& id)
     : Robot(id, "HarvestingBot-" + id),
-      cropType(cropType),
       totalHarvestedKg(0.0),
       totalDeadKg(0.0),
       totalPlantKg(0.0),
       harvests(0) {}
 
-bool HarvestingBot::evaluateAndHarvest(const string& zone,
-                                       double        expectedYieldKg,
-                                       PlantStatus   status) {
-    cout << name << ": Scanning zone [" << zone << "]\n"
-         << "  Plant Status : " << statusToString(status) << "\n";
+bool HarvestingBot::evaluateAndHarvest(const CropData   farm[3][3],
+                                       int              r,
+                                       int              c,
+                                       Plot::Status status) {
+    // ── Step 1: Get CropData from farm array ──────────────────
+    CropData    cropData = farm[r][c];
+    std::string cropName = cropData.getName();
 
+    // ── Step 2: Generate random yield between 80-100% of 1kg ──
+    std::random_device             rd;
+    std::mt19937                   gen(rd());
+    std::uniform_real_distribution dist(0.80, 1.00);
+
+    double maxYieldKg    = 1.0;
+    double percentage    = dist(gen);
+    double expectedYield = maxYieldKg * percentage;
+
+    std::cout << name << ": Scanning plot ["
+              << r << "][" << c << "]\n"
+              << "  Crop          : " << cropName                  << "\n"
+              << "  Plot Status   : " << statusToString(status)    << "\n"
+              << "  Time to Grow  : " << cropData.getTimeToGrow()       << " days\n"
+              << "  Water/day     : " << cropData.getWaterReq() << " mL\n"
+              << "  Max Yield     : " << maxYieldKg                << " kg\n"
+              << "  Yield %       : " << percentage * 100          << "%\n"
+              << "  Expected Yield: " << expectedYield             << " kg\n";
+
+    // ── Step 3: Calculate yield based on status ───────────────
     switch (status) {
-        case PlantStatus::SEED:
-            cout << "  Seed detected – too early to harvest. Skipping.\n";
+        case Plot::Status::SEED:
+            std::cout << "  Seed detected – too early. Skipping.\n";
             return false;
 
-        case PlantStatus::PLANT:
-            cout << "  Plant ready – harvesting " << expectedYieldKg
-                 << " kg of " << cropType << "...\n";
-            totalPlantKg     += expectedYieldKg;
-            totalHarvestedKg += expectedYieldKg;
-            log.push_back({cropType, status, expectedYieldKg});
+        case Plot::Status::PLANT:
+            std::cout << "  Plant ready – harvesting "
+                      << expectedYield << " kg of " << cropName << "...\n";
+            totalPlantKg     += expectedYield;
+            totalHarvestedKg += expectedYield;
+            log.push_back({cropName, status, expectedYield});
             ++harvests;
-            cout << "  Plant harvested : " << totalPlantKg     << " kg\n"
-                 << "  Total harvested : " << totalHarvestedKg << " kg\n";
+            std::cout << "  Yield           : " << expectedYield   << " kg\n"
+                      << "  Plant harvested : " << totalPlantKg     << " kg\n"
+                      << "  Total harvested : " << totalHarvestedKg << " kg\n";
             return true;
 
-        case PlantStatus::DEAD:
-            cout << "  Dead crop – collecting "
-                 << expectedYieldKg * 0.5
-                 << " kg of " << cropType << "...\n";
-            totalDeadKg      += expectedYieldKg * 0.5;
-            totalHarvestedKg += expectedYieldKg * 0.5;
-            log.push_back({cropType, status, expectedYieldKg * 0.5});
+        case Plot::Status::DEAD: {
+            double deadYield = expectedYield * 0.5;
+            std::cout << "  Dead crop – collecting "
+                      << deadYield << " kg of " << cropName << "...\n";
+            totalDeadKg      += deadYield;
+            totalHarvestedKg += deadYield;
+            log.push_back({cropName, status, deadYield});
             ++harvests;
-            cout << "  Dead collected  : " << totalDeadKg      << " kg\n"
-                 << "  Total harvested : " << totalHarvestedKg << " kg\n";
+            std::cout << "  Yield           : " << deadYield        << " kg\n"
+                      << "  Dead collected  : " << totalDeadKg      << " kg\n"
+                      << "  Total harvested : " << totalHarvestedKg << " kg\n";
             return true;
+        }
     }
     return false;
 }
 
 void HarvestingBot::statusReport() const {
     Robot::statusReport();
-    cout << "  Crop Type      : " << cropType        << "\n"
-         << "  Harvests Done  : " << harvests         << "\n"
-         << "  Total Harvested: " << totalHarvestedKg << " kg\n"
-         << "    Plant        : " << totalPlantKg     << " kg\n"
-         << "    Dead         : " << totalDeadKg      << " kg\n";
+    std::cout << "  Harvests Done  : " << harvests         << "\n"
+              << "  Total Harvested: " << totalHarvestedKg << " kg\n"
+              << "    Plant        : " << totalPlantKg     << " kg\n"
+              << "    Dead         : " << totalDeadKg      << " kg\n";
 
     if (!log.empty()) {
-        cout << "  Harvest Log:\n";
+        std::cout << "  Harvest Log:\n";
 
-        cout << "    [Plant Harvests]\n";
+        std::cout << "    [Plant Harvests]\n";
         bool anyPlant = false;
         for (const auto& r : log) {
-            if (r.status == PlantStatus::PLANT) {
-                cout << "      " << r.cropType
-                     << " | "   << r.yieldKg << " kg\n";
+            if (r.status == Plot::Status::PLANT) {
+                std::cout << "      " << r.cropName
+                          << " | "   << r.yieldKg << " kg\n";
                 anyPlant = true;
             }
         }
-        if (!anyPlant) cout << "      (none)\n";
+        if (!anyPlant) std::cout << "      (none)\n";
 
-        cout << "    [Dead Harvests]\n";
+        std::cout << "    [Dead Harvests]\n";
         bool anyDead = false;
         for (const auto& r : log) {
-            if (r.status == PlantStatus::DEAD) {
-                cout << "      " << r.cropType
-                     << " | "   << r.yieldKg << " kg\n";
+            if (r.status == Plot::Status::DEAD) {
+                std::cout << "      " << r.cropName
+                          << " | "   << r.yieldKg << " kg\n";
                 anyDead = true;
             }
         }
-        if (!anyDead) cout << "      (none)\n";
+        if (!anyDead) std::cout << "      (none)\n";
     }
 }
