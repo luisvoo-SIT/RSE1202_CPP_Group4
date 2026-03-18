@@ -16,7 +16,7 @@
 
 //actuator functions
 #include "Header_Files/WaterSystemControl.h" //dino water
-//#include "Header_Files/Actuators.h"
+#include "Header_Files/Actuators.h"
 
 //crop data functions
 #include "Header_Files/CropsV2.h" //luis' crop data
@@ -189,11 +189,17 @@ void manageFarm() {
                                    if (farm[r][c].cropName != "Empty"){ 
                                         cout << "take me" << endl;
                                         //cheehui harvest bot;
-                                        harvester.evaluateAndHarvest(farm, r, c, farm[r][c].cropstatus);
+
+                                        
                                         farm[r][c].cropstatus = Plot::Status::EMPTY; //plot status now empty
-                                        //set plotTime and plot water level to 0
+                                        //reset plot to default values
                                         farm[r][c].PlotTime = 0;
                                         farm[r][c].currentWater = 0;
+                                        farm[r][c].currentTemp = 20.0;
+                                        farm[r][c].currentHum = 60.0;
+                                        farm[r][c].currentWater = 0;
+                                        farm[r][c].cropName = "Empty";
+                                        //plant.setTimeToGrow(0);
                                     }
                                     else{
                                         cout << "No crop to harvest." << endl;
