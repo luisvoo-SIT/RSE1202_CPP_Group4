@@ -4,6 +4,10 @@
 #include "HarvestBot.h"
 #include <string>
 
-void writeLogsToFile(const SeedingBot&    seeder,
+
+class FileWriter{
+    public:
+        void writeLogsToFile(const SeedingBot&    seeder,
                      const SprayerBot&    sprayer,
                      const HarvestingBot& harvester);
+    };
