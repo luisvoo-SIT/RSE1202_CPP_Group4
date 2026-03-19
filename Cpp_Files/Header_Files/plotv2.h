@@ -12,6 +12,7 @@ class Plot {
     public:
         float currentTemp = 20.0;
         float currentHum = 60.0;
+        //int currentValue = 0;
         int currentWater = 0;
         bool fertilizersprayed = false;
         bool pestsprayed = false;
