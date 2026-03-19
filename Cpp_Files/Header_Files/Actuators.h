@@ -8,7 +8,7 @@ using namespace std;
 class Actuator
 {
 protected:
-    unsigned int actuatorLevel;
+    int actuatorLevel;
 
 public:
     // Constructor
@@ -18,14 +18,14 @@ public:
     virtual ~Actuator();
     
     // Virtual method (function) to adjust actuator level (during runtime)
-    virtual void adjustActuatorLevel(unsigned int value);
+    virtual void adjustActuatorLevel(int value);
 
     // Method to display actuator level
     void displayActuatorLevel(); 
 
     // Pure virtual function — every derived class MUST override this.
     // This is what enables polymorphism: one function name, many behaviours.
-    virtual void adjust(unsigned int &currentValue) = 0;
+    virtual void adjust(int &currentValue) = 0;
 };
 
 #endif
