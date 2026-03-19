@@ -17,14 +17,13 @@ public:
     // Destructor
     virtual ~Actuator();
     
-    // Virtual method (function) to adjust actuator level (during runtime)
-    virtual void adjustActuatorLevel(int value);
+    // Internal setter, it writes a value into actuatorLevel
+    void adjustActuatorLevel(int value);
 
     // Method to display actuator level
     void displayActuatorLevel(); 
 
-    // Pure virtual function — every derived class MUST override this.
-    // This is what enables polymorphism: one function name, many behaviours.
+    // Virtual function, derived class overrides the value inside here. (This enables polymorphism)
     virtual void adjust(int &currentValue) = 0;
 };
 
