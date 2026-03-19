@@ -19,6 +19,7 @@
 //actuator functions
 #include "Header_Files/WaterSystemControl.h" //dino water
 #include "Header_Files/Actuators.h"
+#include "Header_Files/Controls.h"
 
 //crop data functions
 #include "Header_Files/CropsV2.h" //luis' crop data
@@ -36,6 +37,7 @@ int warning = 0; //warning for crop health, if warning reaches 2, crop dies
 //things to initialize:
 WaterSystemControl wsc;
 Plot::Status cropstatus (int i, int r, int c);
+FileWriter fw; //file writer initialization
 
 //bot initializations
 string seedbotname = "S01"; //seeding bot initialization
@@ -281,23 +283,23 @@ void manageFarm() {
                                         availableCrops[0].getWaterReq(); //get water requirement for specific crop
                                         farm[r][c].PlotTime += skip;
                                         GlobalTime += skip; //advance global time by skip
-                                        for (int i = 1; i < skip; i++) {
+                                        for (int i = 1; i <= skip; i++) {
                                             farm[r][c].currentWater -= (availableCrops[0].getWaterReq()); //decrease water level by water requirement each day
                                             if (farm[r][c].currentWater > (availableCrops[0].getWaterReq() + 5) || (farm[r][c].currentWater < (availableCrops[0].getWaterReq() - 5)) || (farm[r][c].currentWater == 0)) { //if current water level is not within 5 units of water requirement, crop is dying
                                                 warning++;
                                                 if (farm[r][c].currentWater < 0) {farm[r][c].currentWater = 0;} //if water level goes below 0, set it to 0  
-                                                cout << "Your crop is dying, at plot day: " << i << endl;
-                                                cout << "Crop water requires:" << availableCrops[0].getWaterReq() << "liters of water per day." << endl;
+                                                cout << "Your crop is dying, at plot day: " << farm[r][c].PlotTime << endl;
+                                                cout << "Crop water requires:" << availableCrops[0].getWaterReq() << " liters of water per day." << endl;
                                                 cout << "Current water level: " << farm[r][c].currentWater << " liters." << endl << endl;
                                                     
-                                                /* // for debugging purposes
+                                                 // for debugging purposes
                                                 cout << skip << endl;
                                                 cout << farm[r][c].PlotTime << endl; 
                                                 cout << GlobalTime << endl << endl; 
                                                 cout << "warnings: " << warning << endl;
-                                                */
                                                 
-                                                //for each day skipped, check if crop is dying or ready for harvest
+                                                
+                                                //for each day skipped, check if crop is dying
                                                 if (warning >= 2) { //if warning reaches 2, crop dies
                                                     farm[r][c].cropstatus = 2;
                                                 
@@ -310,17 +312,30 @@ void manageFarm() {
                                                     farm[r][c].cropstatus = 1;
                                                     
                                                 }
-                                                else {
-                                                    cout << "No crop." << endl;
-                                                    break;
-                                                }
+                                                
+                                                
                                             } 
-                                            //after skipping time, display new plot details    
-                                            farm[r][c].currentWater -= availableCrops[0].getWaterReq(); //decrease water level by water requirement each day
+                                            
+                                            //crop logic
+                                            if (farm[r][c].PlotTime >= availableCrops[0].getTimeToGrow()) { //if time is greater than or equal to time to grow, crop is harvestable
+                                                    farm[r][c].cropstatus = 1;
+                                                    
+                                            }
+                                            else if (warning >= 2) { //if warning reaches 2, crop dies
+                                                    farm[r][c].cropstatus = 2;
+                                                
+                                            }
+                                            else {
+                                                    farm [r][c].cropstatus = 0;
+                                            }
+                                                    
+                                            //after skipping time, display new plot details      
                                             if (farm[r][c].currentWater < 0) farm[r][c].currentWater = 0; //if water level goes below 0, set it to 0  
                                             cout<< "Plot time: " << farm[r][c].PlotTime <<endl;
                                             cout << "Global time: " << GlobalTime << endl;   
-                                            cout << "Crop status: " << farm[r][c].cropstatus << endl;  
+                                            cout << "Crop status: " << farm[r][c].cropstatus << endl;
+                                            cout << "Current water level: " << farm[r][c].currentWater << endl;  
+                                            cout << availableCrops[0].getTimeToGrow() << endl;
                                         } 
                                         break;
                                     }
@@ -337,6 +352,8 @@ void manageFarm() {
                                     break;
                                 case 7: //return to main menu
                                     cout << "Returning to main menu..." << endl;
+                                    cout << "Writing logs to file..." << endl;
+                                    fw.writeLogsToFile(seeder, sprayer, harvester);
                                     break;
                                 default:
                                     break;
@@ -373,7 +390,7 @@ int main()
         case 2:
             //Write Logs to File
             cout << "Writing logs to file..." << endl;
-            writeLogsToFile(seeder, sprayer, harvester);
+            fw.writeLogsToFile(seeder, sprayer, harvester);
             break;
         
         case 3:

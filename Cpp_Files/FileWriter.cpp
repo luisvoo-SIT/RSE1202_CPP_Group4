@@ -6,71 +6,91 @@
 
 using namespace std;
 
-void writeLogsToFile(const SeedingBot&    seeder,
-                     const SprayerBot&    sprayer,
-                     const HarvestingBot& harvester) {
+// ── helper function for getting int input ─────────────────────
+static int getIntInput(const string& prompt, int min, int max) {
+    while (true) {
+        cout << prompt;
 
-    // ── Ask user for file name ────────────────────────────────
+        int value;
+        cin >> value;
+
+        if (cin.fail()) {
+            cout << "Error: please enter a number between "
+                 << min << " and " << max << ".\n";
+            cin.clear();
+            cin.ignore(1000, '\n');
+            continue;
+        }
+
+        char leftover = cin.peek();
+        if (leftover != '\n' && leftover != EOF) {
+            cout << "Error: please enter a whole number.\n";
+            cin.ignore(1000, '\n');
+            continue;
+        }
+
+        cin.ignore(1000, '\n');
+
+        if (value < min || value > max) {
+            cout << "Error: please enter between "
+                 << min << " and " << max << ".\n";
+            continue;
+        }
+
+        return value;
+    }
+}
+
+// ── FileWriter member function ────────────────────────────────
+void FileWriter::writeLogsToFile(const SeedingBot&    seeder,
+                                 const SprayerBot&    sprayer,
+                                 const HarvestingBot& harvester) {
+
+    // ── ask user for file name ────────────────────────────────
     string fileName;
     cout << "\nEnter output file name: ";
     cin  >> fileName;
+    cin.ignore(1000, '\n');
 
-    // ── Check what extension the user entered ─────────────────
+    // ── check what extension the user entered ─────────────────
     bool hasTxt = fileName.find(".txt") != string::npos;
     bool hasCsv = fileName.find(".csv") != string::npos;
-
-    // ── Check if user entered an unsupported extension ────────
-    bool hasOtherExtension = false;
-    if (!hasTxt && !hasCsv) {
-        size_t dotPos = fileName.find_last_of(".");
-        if (dotPos != string::npos) {
-            // ── dot found but not .txt or .csv ────────────────
-            hasOtherExtension = true;
-            string enteredExt = fileName.substr(dotPos);
-            cout << "Unsupported file format: " << enteredExt << "\n"
-                 << "Supported formats are .txt and .csv only.\n";
-
-            // ── remove the unsupported extension ──────────────
-            fileName = fileName.substr(0, dotPos);
-            cout << "File name changed to: " << fileName << "\n";
-        }
-    }
 
     int formatChoice;
 
     if (hasTxt) {
-        // ── user already typed .txt ───────────────────────────
         cout << "Text file format detected.\n";
         formatChoice = 1;
 
     } else if (hasCsv) {
-        // ── user already typed .csv ───────────────────────────
         cout << "CSV file format detected.\n";
         formatChoice = 2;
 
     } else {
-        // ── no valid extension — ask user to choose ───────────
-        cout << "\n=== Select File Format ===\n"
-             << "1. Text file (.txt)\n"
-             << "2. CSV file  (.csv)\n"
-             << "Select format: ";
-
-        cin >> formatChoice;
-
-        // ── validate choice ───────────────────────────────────
-        while (formatChoice != 1 && formatChoice != 2) {
-            cout << "Invalid choice. Please enter 1 or 2: ";
-            cin  >> formatChoice;
+        // ── check for unsupported extension ───────────────────
+        size_t dotPos = fileName.find_last_of(".");
+        if (dotPos != string::npos) {
+            string enteredExt = fileName.substr(dotPos);
+            cout << "Unsupported format: " << enteredExt << "\n"
+                 << "Supported formats are .txt and .csv only.\n";
+            fileName = fileName.substr(0, dotPos);
+            cout << "File name changed to: " << fileName << "\n";
         }
 
-        // ── add extension ─────────────────────────────────────
+        // ── ask user to choose format ─────────────────────────
+        cout << "\n=== Select File Format ===\n"
+             << "1. Text file (.txt)\n"
+             << "2. CSV file  (.csv)\n";
+
+        formatChoice = getIntInput("Select format: ", 1, 2);
+
         if (formatChoice == 1)
             fileName += ".txt";
         else
             fileName += ".csv";
     }
 
-    // ── Open file ─────────────────────────────────────────────
+    // ── open file ─────────────────────────────────────────────
     ofstream file(fileName);
     if (!file.is_open()) {
         cout << "Error: could not create file " << fileName << "\n";
@@ -79,7 +99,6 @@ void writeLogsToFile(const SeedingBot&    seeder,
 
     file << fixed << setprecision(2);
 
-    // ── Write based on format ─────────────────────────────────
     if (formatChoice == 2) {
         // ══════════════════════════════════════════════════════
         //  CSV FORMAT
@@ -133,7 +152,7 @@ void writeLogsToFile(const SeedingBot&    seeder,
             for (size_t i = 0; i < harvestLog.size(); ++i) {
                 file << i + 1                        << ","
                      << harvestLog[i].cropName       << ","
-                     << (harvestLog[i].status == Plot::Status::PLANT
+                     << (harvestLog[i].status == Plot::PLANT
                             ? "Plant" : "Dead")      << ","
                      << harvestLog[i].yieldKg        << "\n";
             }
@@ -202,7 +221,7 @@ void writeLogsToFile(const SeedingBot&    seeder,
             file << "    [Plant Harvests]\n";
             bool anyPlant = false;
             for (const auto& r : harvestLog) {
-                if (r.status == Plot::Status::PLANT) {
+                if (r.status == Plot::PLANT) {
                     file << "      " << r.cropName
                          << " | "   << r.yieldKg << " kg\n";
                     anyPlant = true;
@@ -213,7 +232,7 @@ void writeLogsToFile(const SeedingBot&    seeder,
             file << "    [Dead Harvests]\n";
             bool anyDead = false;
             for (const auto& r : harvestLog) {
-                if (r.status == Plot::Status::DEAD) {
+                if (r.status == Plot::DEAD) {
                     file << "      " << r.cropName
                          << " | "   << r.yieldKg << " kg\n";
                     anyDead = true;
