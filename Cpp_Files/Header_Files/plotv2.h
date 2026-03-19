@@ -12,7 +12,10 @@ class Plot {
     public:
         float currentTemp = 20.0;
         float currentHum = 60.0;
-        unsigned int currentWater = 0;
+        int currentWater = 0;
+        bool fertilizersprayed = false;
+        bool pestsprayed = false;
+        bool herbsprayed = false;
         string cropName = "Empty";
 
         enum Status { SEED, PLANT, DEAD, EMPTY};
@@ -24,12 +27,15 @@ class Plot {
 
         // Default constructor
         Plot() = default;
-
+        void manageFarm();
         // Plot constructor
         Plot(float cTemp, float cHum, unsigned int cWater){
             currentTemp = cTemp;
             currentHum = cHum;
             currentWater = cWater;
+        
         }
+
+     //main function to manage the farm, will call other functions from plotv2.cpp
 };
 #endif
