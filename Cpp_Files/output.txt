@@ -1,0 +1,31 @@
+========================================
+           SeedingBot Log
+========================================
+  Seeds Planted: 2
+  Seed Log:
+    Session 1 | Spinach | Time to Grow  : 5 days | Water/day     : 4.00 mL | Humidity      : 60 - 75 % | Temperature   : 15 - 25 C | UV Intensity  : 10 - 20
+    Session 2 | Spinach | Time to Grow  : 5 days | Water/day     : 4.00 mL | Humidity      : 60 - 75 % | Temperature   : 15 - 25 C | UV Intensity  : 10 - 20
+
+========================================
+           SprayerBot Log
+========================================
+  Sessions Done: 0
+  Spray Log:
+    (none)
+
+========================================
+          HarvestingBot Log
+========================================
+  Harvests Done  : 2
+  Total Harvested: 1.40 kg
+    Plant        : 0.95 kg
+    Dead         : 0.45 kg
+  Harvest Log:
+    [Plant Harvests]
+      Spinach | 0.95 kg
+    [Dead Harvests]
+      Spinach | 0.45 kg
+
+========================================
+            End of Report
+========================================
