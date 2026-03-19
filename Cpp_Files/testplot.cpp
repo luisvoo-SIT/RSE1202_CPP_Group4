@@ -19,6 +19,7 @@
 //actuator functions
 #include "Header_Files/WaterSystemControl.h" //dino water
 #include "Header_Files/Actuators.h"
+#include "Header_Files/Controls.h"
 
 //crop data functions
 #include "Header_Files/CropsV2.h" //luis' crop data
@@ -36,6 +37,7 @@ int warning = 0; //warning for crop health, if warning reaches 2, crop dies
 //things to initialize:
 WaterSystemControl wsc;
 Plot::Status cropstatus (int i, int r, int c);
+FileWriter fw; //file writer initialization
 
 //bot initializations
 string seedbotname = "S01"; //seeding bot initialization
@@ -351,7 +353,7 @@ void manageFarm() {
                                 case 7: //return to main menu
                                     cout << "Returning to main menu..." << endl;
                                     cout << "Writing logs to file..." << endl;
-                                    writeLogsToFile(seeder, sprayer, harvester);
+                                    fw.writeLogsToFile(seeder, sprayer, harvester);
                                     break;
                                 default:
                                     break;
@@ -388,7 +390,7 @@ int main()
         case 2:
             //Write Logs to File
             cout << "Writing logs to file..." << endl;
-            writeLogsToFile(seeder, sprayer, harvester);
+            fw.writeLogsToFile(seeder, sprayer, harvester);
             break;
         
         case 3:
