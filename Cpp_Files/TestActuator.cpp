@@ -1,33 +1,39 @@
 /*
-// @Ethan this one is to be integrated into Plot.cpp 
+// For testing (if somehow can add display the other actuator subclasses)
 
-#include "WaterSystemControl.h"
-#include "TempControl.h"
-#include "HumidityControl.h"
-#include "UvControl.h"
+#include "Controls.h"
 
-
-
-// @Ethan this one is to be integrated into Plot.cpp 
-
-int main()
+int main() // DisplayActuatorControl()
 {
     system("cls"); // clear console for better readability
     // default environment variables
-    float currentWaterlvl = 4.0f;
-    float currentTemp = 20.0f; 
-    float currentHum = 60.0f; 
-    float currentUV = 10.0f;
+    unsigned int currentWater = 4;
+    unsigned int currentTemp = 20; 
+    unsigned int currentHum = 60; 
+    unsigned int currentUV = 10;
     
+    // Base class pointer — can point to ANY of the derived objects above
+    Actuator* actuator = nullptr;
+
+    // Pointer to the correct environment variable to update
+    // This lets us pass the right variable into adjust() via the base pointer
+    unsigned int* targetValue = nullptr;
+
+    //Creating objects for the actuators
+    WaterSystemControl wsc;
+    TempControl        tc;
+    HumidityControl    hc;
+    UVControl          uvc; 
+
     int choice; // int variable for storing user input for choice of actuator (1-4)
     do
     {
         cout << "\n=== Actuator Control System ===" << endl;
         cout << "Displaying current environment data:" << endl;
-        cout << "  Water Level : " << currentWaterlvl << " litres" << endl;
+        cout << "  Water Level : " << currentWater << " litres" << endl;
         cout << "  Temperature : " << currentTemp  << " C" << endl;
         cout << "  Humidity    : " << currentHum   << " %" << endl;
-        cout << "  UV Light    : " << currentUV    << " units" << endl;
+        cout << "  UV Light    : " << currentUV  << " units" << endl;
 
         cout << "\nSelect actuator to adjust:" << endl;
         cout << "  1) Water System Control" << endl;
@@ -37,49 +43,63 @@ int main()
         cout << "  5) Exit" << endl;
         cout << "\nChoice: ";
         cin >> choice;
+        cin.clear();     // clear error flags
+        cin.ignore(numeric_limits<streamsize>::max(),'\n'); // clear input buffer
 
         switch (choice)
         {
+            // Case 1: WaterSystemControl
             case 1:
             {
-                WaterSystemControl wsc;                 // create object of water system control class
-                wsc.adjustWater(currentWaterlvl);    // call function to adjust water level
+                actuator = &wsc;           // point base pointer at WaterSystemControl
+                targetValue = &currentWater;  // point to the water variable
                 break;
 
             }
 
-            case 2:
-            { 
-                TempControl tc;                 // create object of moisture control class
-                tc.adjustTemperature(currentTemp);    // call function to adjust temperature level
+            // Case 2: TempControl
+            case 2: 
+            {
+                actuator = &tc;
+                targetValue = &currentTemp;
                 break;
-
             }
 
+            // Case 3: HumidityControl
             case 3:
             {
-                HumidityControl hc;                 // create object of humidity control class
-                hc.adjustHumidity(currentHum);    // call function to adjust humidity level
+                actuator = &hc;
+                targetValue = &currentHum;
                 break;
             }
 
+            // Case 4: UVControl
             case 4:
             {
-                UVControl uv;                 // create object of UV control class
-                uv.adjustUV(currentUV);    // call function to adjust UV level
+                actuator = &uvc;
+                targetValue = &currentUV;
                 break;
             }
-            
+
+            // Case 5, exit Actuator Control Display menu
             case 5: 
                 cout << "Exiting Actuator Control" << endl;
                 break;
 
             default: 
                 cout << "Invalid choice. Please try again (1-5)" << endl;
-
+                //break;
 
         }
 
+        // If a valid actuator was selected (not Exit or invalid), call adjust() through
+        // the base pointer — C++ picks the correct derived class version at runtime
+        if (actuator != nullptr && choice != 5)
+        {
+            actuator->adjust(*targetValue);  // *targetValue dereferences the pointer to pass by reference
+            actuator = nullptr;              // reset pointer after each use
+            targetValue = nullptr;
+        }
 
 
     }
@@ -90,6 +110,4 @@ int main()
     
     
 }
-
-
 */
