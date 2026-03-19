@@ -1,4 +1,5 @@
 #include "Header_Files/Controls.h"
+#include "Header_Files/Actuators.h"
 
 // ── Shared helper: handles all the input validation logic ──────────────────
 // Returns a valid unsigned int within [0, max], re-prompting on bad input.
