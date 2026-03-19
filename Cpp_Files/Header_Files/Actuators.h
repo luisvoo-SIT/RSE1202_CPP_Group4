@@ -18,7 +18,7 @@ public:
     virtual ~Actuator();
     
     // Virtual method (function) to adjust actuator level (during runtime)
-    virtual void adjustActuatorLevel(int value);
+    void adjustActuatorLevel(int value);
 
     // Method to display actuator level
     void displayActuatorLevel(); 
