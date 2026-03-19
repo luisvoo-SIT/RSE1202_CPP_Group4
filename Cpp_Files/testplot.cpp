@@ -17,7 +17,6 @@
 #include "Header_Files/time.h"
 
 //actuator functions
-#include "Header_Files/WaterSystemControl.h" //dino water
 #include "Header_Files/Actuators.h"
 #include "Header_Files/Controls.h"
 
@@ -133,8 +132,8 @@ void manageFarm() {
                     cout << "Crop Status: " << farm[r][c].StatusNames[farm[r][c].cropstatus] << endl;
                     cout << "Temperature: " << farm[r][c].currentTemp << "°C" << endl;
                     cout << "Humidity:    " << farm[r][c].currentHum << "%" << endl;
-                    if (farm[r][c].currentWater < 0) farm[r][c].currentWater = 0; //if water level goes below 0, set it to 0
-                    cout << "Water Level: " << farm[r][c].currentWater << endl; //set to 0 if water level goes below 0 in time skipping logic
+                    if (farm[r][c].currentValue < 0) farm[r][c].currentValue = 0; //if water level goes below 0, set it to 0
+                    cout << "Water Level: " << farm[r][c].currentValue << endl; //set to 0 if water level goes below 0 in time skipping logic
                     cout << "Time Planted: " << farm[r][c].PlotTime << " days" << endl;
                     cout << "Global Time: " << GlobalTime << " days" << endl;
 
@@ -158,7 +157,7 @@ void manageFarm() {
                         cout << "4. View Other Plots" << endl;
                         cout << "5. Skip the Day" << endl;
                         cout << "6. Water Plants" << endl;
-                        cout << "7. Return to Main Menu" << endl << endl;
+                        cout << "7. Generate Farm Logs" << endl << endl;
                         cout << "Select Your Option: ";
                         cin >> farmchoice;
 
@@ -210,10 +209,10 @@ void manageFarm() {
                                         //reset plot to default values
                                         farm[r][c].cropstatus = Plot::Status::EMPTY;
                                         farm[r][c].PlotTime = 0;
-                                        farm[r][c].currentWater = 0;
+                                        farm[r][c].currentValue = 0;
                                         farm[r][c].currentTemp = 20.0;
                                         farm[r][c].currentHum = 60.0;
-                                        farm[r][c].currentWater = 0;
+                                        farm[r][c].currentValue = 0;
                                         farm[r][c].cropName = "Empty";
                                         warning = 0; //reset warning count for new crop
 
@@ -248,6 +247,7 @@ void manageFarm() {
                                             chemical.clear();
                                         }
                                         else (cout << "No Chemical Sprayed" << endl);
+                                        break;
                                     }
                                     else{
                                         cout << "No crop to apply pesticide." << endl;
@@ -272,10 +272,11 @@ void manageFarm() {
 
                                     //check for empty plot - only global time will advance here
                                     if (farm[r][c].cropName == "Empty"){ //if (farm[r][c].cropName != "Empty") - replace current statement w this once seeding bot is working:
-                                        farm[r][c].currentWater = 0; //if no crop, water level stays at 0
+                                        farm[r][c].currentValue = 0; //if no crop, water level stays at 0
                                         GlobalTime += skip; //if no crop, just advance global time
                                         cout << "No crop to advance time for." << endl;
                                         cout << "Global Time has been advanced by " << skip << " days." << endl;
+                                        break;
                                     }
 
                                     //time skipping logic
@@ -284,13 +285,13 @@ void manageFarm() {
                                         farm[r][c].PlotTime += skip;
                                         GlobalTime += skip; //advance global time by skip
                                         for (int i = 1; i <= skip; i++) {
-                                            farm[r][c].currentWater -= (availableCrops[0].getWaterReq()); //decrease water level by water requirement each day
-                                            if (farm[r][c].currentWater > (availableCrops[0].getWaterReq() + 5) || (farm[r][c].currentWater < (availableCrops[0].getWaterReq() - 5)) || (farm[r][c].currentWater == 0)) { //if current water level is not within 5 units of water requirement, crop is dying
+                                            farm[r][c].currentValue -= (availableCrops[0].getWaterReq()); //decrease water level by water requirement each day
+                                            if (farm[r][c].currentValue > (availableCrops[0].getWaterReq() + 5) || (farm[r][c].currentValue < (availableCrops[0].getWaterReq() - 5)) || (farm[r][c].currentValue == 0)) { //if current water level is not within 5 units of water requirement, crop is dying
                                                 warning++;
-                                                if (farm[r][c].currentWater < 0) {farm[r][c].currentWater = 0;} //if water level goes below 0, set it to 0  
+                                                if (farm[r][c].currentValue < 0) {farm[r][c].currentValue = 0;} //if water level goes below 0, set it to 0  
                                                 cout << "Your crop is dying, at plot day: " << farm[r][c].PlotTime << endl;
                                                 cout << "Crop water requires:" << availableCrops[0].getWaterReq() << " liters of water per day." << endl;
-                                                cout << "Current water level: " << farm[r][c].currentWater << " liters." << endl << endl;
+                                                cout << "Current water level: " << farm[r][c].currentValue << " liters." << endl << endl;
                                                     
                                                  // for debugging purposes
                                                 cout << skip << endl;
@@ -330,11 +331,11 @@ void manageFarm() {
                                             }
                                                     
                                             //after skipping time, display new plot details      
-                                            if (farm[r][c].currentWater < 0) farm[r][c].currentWater = 0; //if water level goes below 0, set it to 0  
+                                            if (farm[r][c].currentValue < 0) farm[r][c].currentValue = 0; //if water level goes below 0, set it to 0  
                                             cout<< "Plot time: " << farm[r][c].PlotTime <<endl;
                                             cout << "Global time: " << GlobalTime << endl;   
                                             cout << "Crop status: " << farm[r][c].cropstatus << endl;
-                                            cout << "Current water level: " << farm[r][c].currentWater << endl;  
+                                            cout << "Current water level: " << farm[r][c].currentValue << endl;  
                                             cout << availableCrops[0].getTimeToGrow() << endl;
                                         } 
                                         break;
@@ -343,15 +344,14 @@ void manageFarm() {
                                     cout << "feeeeeeeeed" << endl;
                                     if (farm[r][c].cropName != "Empty"){ //if (farm[r][c].cropName != "Empty") - replace current statement w this once seeding bot is working:
                                         cout << "feed me" << endl;
-                                        wsc.adjustWater(farm[r][c].currentWater); //dinowater
-                                        cout << "Current water level: " << farm[r][c].currentWater << endl;
+                                        wsc.adjust(farm[r][c].currentValue); //dino actuator function
+                                        cout << "Current water level: " << farm[r][c].currentValue << endl;
                                     }
                                     else{
                                         cout << "No crop to water." << endl;
                                     }
                                     break;
-                                case 7: //return to main menu
-                                    cout << "Returning to main menu..." << endl;
+                                case 7: //generate farm logs
                                     cout << "Writing logs to file..." << endl;
                                     fw.writeLogsToFile(seeder, sprayer, harvester);
                                     break;
