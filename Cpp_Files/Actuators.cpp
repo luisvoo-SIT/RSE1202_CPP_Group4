@@ -10,7 +10,7 @@ Actuator::~Actuator()
     // code if needed
 }
 
-void Actuator::adjustActuatorLevel(unsigned int value)
+void Actuator::adjustActuatorLevel(int value)
 {
     actuatorLevel = value;
 }

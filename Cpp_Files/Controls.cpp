@@ -2,7 +2,7 @@
 
 // ── Shared helper: handles all the input validation logic ──────────────────
 // Returns a valid unsigned int within [0, max], re-prompting on bad input.
-static unsigned int getValidInput(const string &prompt, unsigned int max)
+static int getValidInput(const string &prompt, int max)
 {
     string input;
     cout << prompt;   // print the prompt passed in (e.g. "Enter water value (0-10): ")
@@ -27,7 +27,7 @@ static unsigned int getValidInput(const string &prompt, unsigned int max)
         }
 
         istringstream iss(input);
-        unsigned int parsedValue;
+        int parsedValue;
         char leftover;
 
         if (!(iss >> parsedValue))      // fails if input isn't numeric
@@ -42,7 +42,7 @@ static unsigned int getValidInput(const string &prompt, unsigned int max)
             continue;
         }
 
-        if (parsedValue > max)      // fails if user enter exceed max value
+        if (parsedValue > max || parsedValue < 0)      // fails if user enter exceed max value or < 0
         {
             cout << "Invalid input. Value must be between 0 and " << max << ": ";
             continue;
@@ -53,36 +53,36 @@ static unsigned int getValidInput(const string &prompt, unsigned int max)
 }
 
 // WaterSystemControl
-void WaterSystemControl::adjust(unsigned int &currentValue)
+void WaterSystemControl::adjust(int &currentValue)
 {
-    unsigned int newVal = getValidInput("Enter water value (0-10): ", 10); //max water value allowed is set to 10
+    int newVal = getValidInput("Enter water value (0-10): ", 10); //max water value allowed is set to 10
     adjustActuatorLevel(newVal);    // updates actuatorLevel in base class
     currentValue = newVal;
     cout << ">>> Water level has been updated to: " << currentValue << " litres" << endl;
 }
 
 // TempControl
-void TempControl::adjust(unsigned int &currentValue)
+void TempControl::adjust(int &currentValue)
 {
-    unsigned int newVal = getValidInput("Enter temperature value (0-50): ", 50); //max temperature value allowed is set to 50
+    int newVal = getValidInput("Enter temperature value (0-50): ", 50); //max temperature value allowed is set to 50
     adjustActuatorLevel(newVal);    // updates actuatorLevel in base class
     currentValue = newVal;
     cout << ">>> Temperature has been updated to: " << currentValue << " C" << endl;
 }
 
 // HumidityControl
-void HumidityControl::adjust(unsigned int &currentValue)
+void HumidityControl::adjust(int &currentValue)
 {
-    unsigned int newVal = getValidInput("Enter humidity value (0-100): ", 100); //max humidity value allowed is set to 100
+    int newVal = getValidInput("Enter humidity value (0-100): ", 100); //max humidity value allowed is set to 100
     adjustActuatorLevel(newVal);    // updates actuatorLevel in base class
     currentValue = newVal;
     cout << ">>> Humidity has been updated to: " << currentValue << " %" << endl;
 }
 
 // UVControl 
-void UVControl::adjust(unsigned int &currentValue)
+void UVControl::adjust(int &currentValue)
 {
-    unsigned int newVal = getValidInput("Enter UV value (0-100): ", 100); //max UV value allowed is set to 100
+    int newVal = getValidInput("Enter UV value (0-100): ", 100); //max UV value allowed is set to 100
     adjustActuatorLevel(newVal);    // updates actuatorLevel in base class
     currentValue = newVal;
     cout << ">>> UV Light has been updated to: " << currentValue << " %" << endl;
