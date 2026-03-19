@@ -345,9 +345,12 @@ void manageFarm() {
                     case 6: //watering plants
                     cout << "Watering plants..." << endl;
                     if (farm[r][c].cropName != "Empty") {
-                        Actuator* actuator = &wsc;                       // base pointer points to WaterSystemControl
-                        actuator->adjust(farm[r][c].currentWater);       // polymorphic call — runs WaterSystemControl::adjust() at runtime
-                        actuator = nullptr;                              // reset pointer after use
+                        Actuator* actuator = &wsc; // base pointer points to WaterSystemControl
+                        if (cin.peek() == '\n') {
+                            cin.get();
+                        }
+                        actuator->adjust(farm[r][c].currentWater); // polymorphic call — runs WaterSystemControl::adjust() at runtime
+                        actuator = nullptr;// reset pointer after use
                         cout << "Current water level: " << farm[r][c].currentWater << endl;
                     } else {
                         cout << "No crop to water." << endl;
