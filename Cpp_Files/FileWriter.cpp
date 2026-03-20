@@ -44,7 +44,8 @@ static int getIntInput(const string& prompt, int min, int max) {
 // ── FileWriter member function ────────────────────────────────
 void FileWriter::writeLogsToFile(const SeedingBot&    seeder,
                                  const SprayerBot&    sprayer,
-                                 const HarvestingBot& harvester) {
+                                 const HarvestingBot& harvester,
+                                 int                  GlobalTime) {
 
     // ── ask user for file name ────────────────────────────────
     string fileName;
@@ -103,6 +104,11 @@ void FileWriter::writeLogsToFile(const SeedingBot&    seeder,
         // ══════════════════════════════════════════════════════
         //  CSV FORMAT
         // ══════════════════════════════════════════════════════
+
+         file << "FARM REPORT\n"
+             << "Total Days Run," << GlobalTime << "\n\n";  
+
+
         file << "SEEDINGBOT LOG\n"
              << "Session,CropName,TimeToGrow,WaterPerDay,"
              << "MinHumidity,MaxHumidity,MinTemperature,"
@@ -162,6 +168,13 @@ void FileWriter::writeLogsToFile(const SeedingBot&    seeder,
         // ══════════════════════════════════════════════════════
         //  TXT FORMAT
         // ══════════════════════════════════════════════════════
+
+        file << "========================================\n"
+             << "           Farm Report\n"
+             << "========================================\n"
+             << "  Total Days Run : " << GlobalTime << " days\n"  // ← global time
+             << "========================================\n\n";
+
         file << "========================================\n"
              << "           SeedingBot Log\n"
              << "========================================\n"

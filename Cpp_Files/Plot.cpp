@@ -359,7 +359,7 @@ void manageFarm() {
 
                     case 7: //generate farm logs
                         cout << "Writing logs to file..." << endl;
-                        fw.writeLogsToFile(seeder, sprayer, harvester);
+                        fw.writeLogsToFile(seeder, sprayer, harvester, GlobalTime);
                         break;
 
                     default:
@@ -395,7 +395,7 @@ int main()
             break;
         case 2: //Write Logs to File
             cout << "Writing logs to file..." << endl;
-            fw.writeLogsToFile(seeder, sprayer, harvester);
+            fw.writeLogsToFile(seeder, sprayer, harvester, GlobalTime);
             break;
         case 3: //exit program
             cout << "\nExiting SAGE Simulator.\n";
