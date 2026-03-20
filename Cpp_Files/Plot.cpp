@@ -173,6 +173,8 @@ void manageFarm() {
                             CropData plant = seeder.plantSeeds(1, availableCrops);
                             farm[r][c].cropName = plant.getName();
 
+                            farm[r][c].symbol = plant.getName()[0]; // to get the char of the crop
+
                             cout << "\n=== Selected Crop Data ===\n"
                                  << "  Crop         : " << plant.getName() << "\n"
                                  << "  Time to Grow : " << plant.getTimeToGrow() << " days\n"
@@ -202,6 +204,7 @@ void manageFarm() {
                             if (farm[r][c].cropstatus == Plot::Status::SEED) break;
 
                             farm[r][c].cropstatus = Plot::Status::EMPTY;
+                            farm[r][c].symbol =' ';
                             farm[r][c].PlotTime = 0;
                             farm[r][c].currentWater = 0;
                             farm[r][c].currentTemp = 20.0;
@@ -313,12 +316,16 @@ void manageFarm() {
                                     // status update
                                     if (plotWarnings[i][j] >= 2) {
                                         farm[i][j].cropstatus = Plot::Status::DEAD;
+                                        farm[r][c].symbol     = 'X';
                                     }
                                     else if (farm[i][j].PlotTime >= crop->getTimeToGrow()) {
                                         farm[i][j].cropstatus = Plot::Status::PLANT;
+                                        farm[r][c].symbol     = farm[r][c].cropName[0];     // ← first letter, lowercase
                                     }
                                     else {
                                         farm[i][j].cropstatus = Plot::Status::SEED;
+                                        farm[r][c].symbol     = farm[r][c].cropName[0];
+                                        farm[r][c].symbol     = tolower(farm[r][c].symbol); // ← lowercase = still growing
                                     }
                                 }
                             }
