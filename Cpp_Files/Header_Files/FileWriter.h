@@ -8,6 +8,7 @@
 class FileWriter{
     public:
         void writeLogsToFile(const SeedingBot&    seeder,
-                     const SprayerBot&    sprayer,
-                     const HarvestingBot& harvester);
+                             const SprayerBot&    sprayer,
+                             const HarvestingBot& harvester,
+                             int                  GlobalTime);
     };
