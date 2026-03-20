@@ -4,24 +4,32 @@
 #include <sstream>
 #include <limits>
 
+// Derived class: WaterSystemControl
 class WaterSystemControl : public Actuator {
 public:
-    void adjustWater(unsigned int &currentWater);
+    // Function to adjust water level that takes in current water level as parameter
+    void adjust(int &currentValue) override;
 };
 
+// Derived class: TempControl
 class TempControl : public Actuator {
 public:
-    void adjustTemperature(unsigned int &currentTemp);
+    // Function to adjust temperature that takes in current temperature level as parameter
+    void adjust(int &currentValue) override;
 };
 
+// Derived class: HumidityControl
 class HumidityControl : public Actuator {
 public:
-    void adjustHumidity(unsigned int &currentHum);
+    // Function to adjust humidity that takes in current humidity level as parameter
+    void adjust(int &currentValue) override;
 };
 
+// Derived class: UVControl
 class UVControl : public Actuator {
 public:
-    void adjustUV(unsigned int &currentUV);
+    // Function to adjust UV level that takes in current UV level as parameter
+    void adjust(int &currentValue) override;
 };
 
 #endif

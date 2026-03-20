@@ -5,26 +5,26 @@
 #include <string>
 using namespace std;
 
-// Base class: Actuator
 class Actuator
 {
 protected:
-    unsigned int actuatorLevel; // actuator level (e.g. water level, light level)
+    int actuatorLevel;
 
 public:
     // Constructor
     Actuator();
 
     // Destructor
-    virtual ~Actuator(); 
-
-    // Virtual method (function) to adjust actuator level (during runtime)
-    virtual void adjustActuatorLevel(unsigned int value);
+    virtual ~Actuator();
+    
+    // Internal setter, it writes a value into actuatorLevel
+    void adjustActuatorLevel(int value);
 
     // Method to display actuator level
-    void displayActuatorLevel();
+    void displayActuatorLevel(); 
 
+    // Virtual function, derived class overrides the value inside here. (This enables polymorphism)
+    virtual void adjust(int &currentValue) = 0;
 };
-
 
 #endif

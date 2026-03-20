@@ -1,100 +1,91 @@
-#include "Controls.h"
+#include "Header_Files/Controls.h"
+#include "Header_Files/Actuators.h"
 
-void WaterSystemControl::adjustWater(unsigned int &currentWater)
+// ── Shared helper: handles all the input validation logic ──────────────────
+// Returns a valid unsigned int within [0, max], re-prompting on bad input.
+static int getValidInput(const string &prompt, int max)
 {
-    unsigned int newWater; // Declare unsigned int variable for new water level (newWater)
-    string input;   // string variable to store user input for error handling
+    string input;
+    cout << prompt;   // print the prompt passed in (e.g. "Enter water value (0-10): ")
 
-    // Prompt user to key in value from 0-10
-    cout << "Enter water value (0-10): ";
-    getline(cin, input);
-
-    // While loop for user input error handling
     while (true)
     {
         getline(cin, input);
 
-        // if user input string is empty
         if (input.empty())
         {
-            cout << "Cannot enter an empty value, please enter a value (0-10): ";
-            continue;   // skip to the start of the while loop
+            cout << "Cannot enter an empty value, please try again: ";
+            continue;
         }
 
-        // Check for more than one decimal point
+        // Count decimal points — more than one is invalid (in case we want to implement float variable in future)
         int dotCount = 0;
-        for (char c : input)    // for loop that loops through every character in the string variable "input"
-        {
-            if (c == '.') dotCount++;   // if '.' is encountered, increment the counter by 1
-        }
-
-        // if condition for dotCount > 1, prompts user that they keyed in 
+        for (char c : input) if (c == '.') dotCount++;
         if (dotCount > 1)
         {
             cout << "Invalid input. More than one decimal point detected: ";
-            continue;   // skip to the start of the while loop
+            continue;
         }
 
-        // Try to parse the string as a unsigned int variable type
-        istringstream iss(input);   // Creates an istringsteam object initialized with the string variable (i.e input)
-        unsigned int parsedValue;   // declares unsigned int variable called "parsedValue", it holds the user input value if parsing succeeds
-        char leftover;              // declares char variable called "leftover", it holds any unexpected character found after the user input 
+        istringstream iss(input);
+        int parsedValue;
+        char leftover;
 
-        // Try to read unsigned int value from stream
-        // if not successful, prompt user "Invalid input..."
-        if (!(iss >> parsedValue))
+        if (!(iss >> parsedValue))      // fails if input isn't numeric
         {
             cout << "Invalid input. Please enter a numeric value: ";
-            continue;   // skip to the start of the while loop
+            continue;
         }
 
-         // if have leftover non-numeric characters after the number
-        if (iss >> leftover)
+        if (iss >> leftover)            // fails if there are trailing characters
         {
             cout << "Invalid input. Unexpected characters after the number: ";
             continue;
         }
 
-        // if parsedValue more > 10
-        if (parsedValue > 10)
+        if (parsedValue > max || parsedValue < 0)      // fails if user enter exceed max value or < 0
         {
-            cout << "Invalid input. Value must be between 0 and 10: ";
-            continue;   // skip to the start of the while loop
+            cout << "Invalid input. Value must be between 0 and " << max << ": ";
+            continue;
         }
 
-        // All checks passed, procceds to assign the parsedValue to newWater
-        newWater = parsedValue; // assigns the parsedValue to newWater
-        break;   // exits the while loop
+        return parsedValue;     // all checks passed — return the clean value
     }
-
-    adjustActuatorLevel(newWater);  // updates actuatorLevel in base class Actuator
-    currentWater = newWater;    // assigns new value (newWater) to current water level (currentWater)
-
-    // Prints updated water level to console
-    cout << ">>> Water level has been updated to: " << currentWater << " litres" << endl;
-
 }
 
-// ============================================================
-// TempControl — To be implemented
-// ============================================================
-void TempControl::adjustTemperature(unsigned int &currentTemp)
+// WaterSystemControl
+void WaterSystemControl::adjust(int &currentValue)
 {
-    // TO DO: implement
+    int newVal = getValidInput("Enter water value (0-10): ", 10); //max water value allowed is set to 10
+    adjustActuatorLevel(newVal);    // updates actuatorLevel in base class
+    currentValue = newVal;
+    cout << ">>> Water level has been updated to: " << currentValue << " litres" << endl;
 }
 
-// ============================================================
-// HumidityControl — To be implemented
-// ============================================================
-void HumidityControl::adjustHumidity(unsigned int &currentHum)
+// TempControl
+void TempControl::adjust(int &currentValue)
 {
-    // TO DO: implement
+    int newVal = getValidInput("Enter temperature value (0-50): ", 50); //max temperature value allowed is set to 50
+    adjustActuatorLevel(newVal);    // updates actuatorLevel in base class
+    currentValue = newVal;
+    cout << ">>> Temperature has been updated to: " << currentValue << " C" << endl;
 }
 
-// ============================================================
-// UVControl — To be implemented
-// ============================================================
-void UVControl::adjustUV(unsigned int &currentUV)
+// HumidityControl
+void HumidityControl::adjust(int &currentValue)
 {
-    // TO DO: implement
+    int newVal = getValidInput("Enter humidity value (0-100): ", 100); //max humidity value allowed is set to 100
+    adjustActuatorLevel(newVal);    // updates actuatorLevel in base class
+    currentValue = newVal;
+    cout << ">>> Humidity has been updated to: " << currentValue << " %" << endl;
 }
+
+// UVControl 
+void UVControl::adjust(int &currentValue)
+{
+    int newVal = getValidInput("Enter UV value (0-100): ", 100); //max UV value allowed is set to 100
+    adjustActuatorLevel(newVal);    // updates actuatorLevel in base class
+    currentValue = newVal;
+    cout << ">>> UV Light has been updated to: " << currentValue << " %" << endl;
+}
+
